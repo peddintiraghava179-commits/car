@@ -59,3 +59,21 @@
 .login-disclaimer{display:flex;align-items:flex-start;gap:7px;background:#f7f9fc;border-radius:9px;padding:10px;margin:17px 0 0;color:#8b95a7;font-size:9px;line-height:1.6}
 .login-disclaimer svg{flex-shrink:0;color:#6c9b3c;margin-top:1px}
 @media(max-width:700px){.login-modal{padding:25px 21px;border-radius:18px}.login-modal h2{font-size:23px}}
+
+
+/* Blue route preview, distance/fare chip and clear vehicle selection */
+.route-overlay{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+.route-blue-line{stroke:#1677ff;stroke-width:1.05;stroke-linecap:round;stroke-dasharray:2.2 1.2;filter:drop-shadow(0 1px 1px #fff);opacity:.96}
+.route-start-dot{fill:#fff;stroke:#1677ff;stroke-width:.8}
+.route-end-dot{fill:#1677ff;stroke:#fff;stroke-width:.65}
+.route-map-pill{position:absolute;z-index:3;top:13px;left:13px;display:flex;align-items:center;gap:6px;padding:9px 11px;border-radius:9px;background:#fff;color:#125fc7;font-size:11px;font-weight:800;box-shadow:0 3px 14px #10254b24}
+.route-map-pill svg{color:#1677ff}
+.live-map-wrap iframe{position:relative;z-index:1}
+.open-map-link{z-index:4;background:#1677ff;color:#fff}
+.open-map-link:hover{background:#075ed1}
+.ride-option.chosen{border-color:#1677ff!important;box-shadow:0 0 0 2px #1677ff1c}
+.ride-option.chosen .ride-option-icon{background:#e8f2ff;color:#1677ff}
+.ride-option.chosen .ride-option-price strong{color:#1268db}
+.distance-note{border-left:3px solid #1677ff;background:#eef5ff;color:#355a8a}
+.distance-note svg{color:#1677ff}
+@media(max-width:700px){.route-map-pill{font-size:10px;top:9px;left:9px;padding:8px 9px}}
