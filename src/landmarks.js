@@ -63,6 +63,23 @@ const landmarks = [
   { name: 'Telangana University, Nizamabad, Telangana', city: 'Telangana', lat: 18.52, lon: 78.18, kind: 'College / University' },
   { name: 'Satavahana University, Karimnagar, Telangana', city: 'Telangana', lat: 18.4386, lon: 79.1288, kind: 'College / University' },
   { name: 'Mahatma Gandhi University, Nalgonda, Telangana', city: 'Telangana', lat: 17.05, lon: 79.27, kind: 'College / University' },
-  { name: 'Rajiv Gandhi University of Knowledge Technologies Basar, Telangana', city: 'Telangana', lat: 18.878, lon: 77.955, kind: 'College / University' }
+  { name: 'Rajiv Gandhi University of Knowledge Technologies Basar, Telangana', city: 'Telangana', lat: 18.878, lon: 77.955, kind: 'College / University' },
+// Explicit town search aliases requested for the Godavari region.
+  { name: 'Rajahmundry Town, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.0005, lon: 81.804, kind: 'Town' },
+  { name: 'Bhimavaram Town, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5449, lon: 81.5212, kind: 'Town' },
+  { name: 'Vishnu Institute of Technology, Bhimavaram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5449, lon: 81.5155, kind: 'College / University' },
+  // Airports for convenient airport pickup and drop-off search.
+  { name: 'Rajahmundry Airport (RJA), Madhurapudi, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.1106, lon: 81.8189, kind: 'Airport' },
+  { name: 'Vijayawada Airport (VGA), Gannavaram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5304, lon: 80.7968, kind: 'Airport' },
+  { name: 'Visakhapatnam Airport (VTZ), Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.7212, lon: 83.2245, kind: 'Airport' },
+  { name: 'Tirupati Airport (TIR), Renigunta, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.6325, lon: 79.5433, kind: 'Airport' },
+  { name: 'Kadapa Airport (CDP), Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.5099, lon: 78.7728, kind: 'Airport' },
+  { name: 'Kurnool Airport (KJB), Orvakal, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.4786, lon: 78.1270, kind: 'Airport' },
+  { name: 'Rajiv Gandhi International Airport (HYD), Hyderabad, Telangana', city: 'Telangana', lat: 17.2403, lon: 78.4294, kind: 'Airport' },
+  { name: 'Warangal Airport, Telangana (proposed / not for normal passenger pickup)', city: 'Telangana', lat: 17.914, lon: 79.602, kind: 'Airport (proposed)' },
+  { name: 'Chennai International Airport (MAA), Tamil Nadu', city: 'Tamil Nadu', lat: 12.9941, lon: 80.1709, kind: 'Airport' },
+  { name: 'Coimbatore International Airport (CJB), Tamil Nadu', city: 'Tamil Nadu', lat: 11.0300, lon: 77.0434, kind: 'Airport' },
+  { name: 'Madurai Airport (IXM), Tamil Nadu', city: 'Tamil Nadu', lat: 9.8345, lon: 78.0934, kind: 'Airport' },
+  { name: 'Tiruchirappalli International Airport (TRZ), Tamil Nadu', city: 'Tamil Nadu', lat: 10.7654, lon: 78.7097, kind: 'Airport' }
 ];
 export default landmarks;
