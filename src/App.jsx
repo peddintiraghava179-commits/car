@@ -94,6 +94,12 @@ export default function App() {
   const [showTrips, setShowTrips] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [favorite, setFavorite] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginMode, setLoginMode] = useState('login');
+  const [authUser, setAuthUser] = useState(() => { try { return JSON.parse(localStorage.getItem('ridewave-demo-user') || 'null'); } catch { return null; } });
+  const [loginName, setLoginName] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [toast, setToast] = useState('');
   const [gps, setGps] = useState(null);
   const [gpsStatus, setGpsStatus] = useState('Use GPS to detect your current position');
@@ -173,6 +179,21 @@ export default function App() {
     setBooking(trip);
     setShowTrips(false);
   }
+  function handleLogin(e) {
+    e.preventDefault();
+    if (loginPassword.length < 6) { notify('Use a password with at least 6 characters.'); return; }
+    const user = { name: (loginName.trim() || loginEmail.split('@')[0] || 'Rider'), email: loginEmail.trim() };
+    setAuthUser(user);
+    try { localStorage.setItem('ridewave-demo-user', JSON.stringify(user)); } catch {}
+    setLoginOpen(false);
+    setLoginPassword('');
+    notify(loginMode === 'signup' ? 'Demo account created on this device.' : 'Signed in to this demo on this device.');
+  }
+  function signOut() {
+    setAuthUser(null);
+    try { localStorage.removeItem('ridewave-demo-user'); } catch {}
+    notify('Signed out of this device.');
+  }
   function cancelBooking() {
     setBooking(null);
     notify('Demo booking cancelled.');
@@ -190,7 +211,7 @@ export default function App() {
           <button className={showTrips ? 'nav-link active' : 'nav-link'} onClick={() => { setShowTrips(true); setBooking(null); setMenuOpen(false); }}>My rides</button>
           <a className="nav-link" href="#safety" onClick={() => setMenuOpen(false)}>Safety</a>
         </nav>
-        <button className="profile-button" onClick={() => notify('Sign-in is a demo feature.')}><CircleUserRound size={19} /> <span>Sign in</span></button>
+        {authUser ? <button className="profile-button" onClick={signOut}><CircleUserRound size={19} /> <span>{authUser.name} · Sign out</span></button> : <button className="profile-button" onClick={() => { setLoginMode('login'); setLoginOpen(true); }}><CircleUserRound size={19} /> <span>Sign in</span></button>}
         <button className="mobile-menu" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
       </header>
 
@@ -255,7 +276,7 @@ export default function App() {
                 <div className="regional-picker">
                   <div className="regional-title"><Map size={15}/> Popular locations <span>AP & TS</span></div>
                   <div className="region-chips">{places.slice(0, 6).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
-                  <details className="all-places"><summary>Browse all 25 cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
+                  <details className="all-places"><summary>Browse all {places.length} cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
                 {calculatedDistance && <div className="distance-note"><Route size={14}/> Approx. road-distance estimate: <strong>{calculatedDistance} km</strong> <span>(straight-line distance adjusted; actual route may vary)</span></div>}
                 <div className="section-label"><span>Choose your ride</span><span className="muted">Estimated pickup</span></div>
@@ -296,6 +317,24 @@ export default function App() {
       </main>
 
       <footer><a className="brand footer-brand" href="#"><span className="brand-mark"><Navigation size={18} fill="currentColor"/></span><span>ride<span className="brand-light">wave</span></span></a><span>© 2026 RideWave Prototype</span><div><a href="#safety">Safety</a><button onClick={() => notify('Help center is a demo feature.')}>Help</button><button onClick={() => setFavorite(!favorite)}><Heart size={14} fill={favorite ? 'currentColor' : 'none'}/> {favorite ? 'Saved' : 'Save app'}</button></div></footer>
+
+      {loginOpen && <div className="login-overlay" role="presentation" onClick={e => { if (e.target === e.currentTarget) setLoginOpen(false); }}>
+        <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+          <button type="button" className="login-close" aria-label="Close sign in" onClick={() => setLoginOpen(false)}><X size={20}/></button>
+          <div className="login-logo"><Navigation size={22} fill="currentColor"/></div>
+          <p className="eyebrow">WELCOME TO RIDEWAVE</p>
+          <h2 id="login-title">{loginMode === 'signup' ? 'Create your account' : 'Good to have you back.'}</h2>
+          <p className="login-subtitle">Sign in to personalize your demo ride experience on this device.</p>
+          <form onSubmit={handleLogin} className="login-form">
+            {loginMode === 'signup' && <label>Full name<input value={loginName} onChange={e => setLoginName(e.target.value)} placeholder="Enter your name" required autoComplete="name"/></label>}
+            <label>Email address<input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email"/></label>
+            <label>Password<input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="At least 6 characters" required minLength={6} autoComplete={loginMode === 'signup' ? 'new-password' : 'current-password'}/></label>
+            <button type="submit" className="primary-button"><span>{loginMode === 'signup' ? 'Create demo account' : 'Sign in'}</span><ArrowRight size={18}/></button>
+          </form>
+          <p className="login-switch">{loginMode === 'signup' ? 'Already have an account?' : 'New to RideWave?'} <button type="button" onClick={() => setLoginMode(loginMode === 'signup' ? 'login' : 'signup')}>{loginMode === 'signup' ? 'Sign in' : 'Create account'}</button></p>
+          <p className="login-disclaimer"><ShieldCheck size={14}/> Prototype login only. No server authentication, password storage, or account recovery is connected. Do not use a real password.</p>
+        </section>
+      </div>}
       {toast && <div className="toast" role="status"><CheckCircle2 size={17}/>{toast}</div>}
       <div className="prototype-disclaimer">DEMO PROTOTYPE · GPS REQUIRES PERMISSION · NOT A REAL TRANSPORT SERVICE</div>
     </div>
