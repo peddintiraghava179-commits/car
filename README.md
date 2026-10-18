@@ -1,34 +1,38 @@
 # RideWave — Cab & Bike Booking Prototype
 
-A responsive React + Vite front-end prototype for a cab and bike ride-booking service.
+Responsive React + Vite ride-booking demo focused on Andhra Pradesh and Telangana.
 
 ## Features
-- Toggle between bike/scooter and cab/mini/sedan/XL options.
-- Pickup and destination inputs, plus quick destination suggestions.
-- Adjustable trip distance and illustrative fare estimates.
-- Payment method and ride timing selectors.
-- Booking confirmation with sample driver and route details.
-- Sample ride history, illustrated map, safety section, and responsive mobile navigation.
-- No API keys or paid services required.
+- Switch between bike/scooter and cab/mini/sedan/XL ride options.
+- Browser geolocation using the device's GPS/location permission to fill the pickup field.
+- Interactive OpenStreetMap embed that centers on the selected regional place or detected GPS coordinates.
+- Regional destination list with 25 cities/towns across Telangana and Andhra Pradesh, including Hyderabad, Warangal, Karimnagar, Visakhapatnam, Vijayawada, Guntur, Tirupati, Kurnool, Rajahmundry, Nellore and more.
+- Estimated trip distance when both selected places are in the regional place list, plus estimated fares.
+- Pickup/destination fields, ride timing and payment-method selectors, booking summary, and sample ride history.
+- Responsive layout for desktop and mobile.
+- Uses browser geolocation and OpenStreetMap; no paid API token required.
 
 ## Run locally
 Requirements: Node.js 18+.
 
-```bash
+\`\`\`bash
 npm install
 npm run dev
-```
+\`\`\`
 
 Open the local URL printed by Vite (usually http://localhost:5173).
 
 ## Build
-```bash
+\`\`\`bash
 npm run build
 npm run preview
-```
+\`\`\`
 
 ## GitHub Pages
-A GitHub Actions workflow builds the Vite app and publishes it to GitHub Pages. In the repository settings, open **Pages** and set the source to **GitHub Actions** if it is not already selected.
+The included GitHub Actions workflow builds and publishes the Vite app. In repository Settings → Pages, select **GitHub Actions** as the source if needed.
 
-## Important prototype limitations
-This is a front-end demonstration. Booking, driver details, ride history, map, GPS, payment, and support are simulated. It does not dispatch real drivers, collect payment, or use a live map API.
+## GPS and map notes
+- Browser GPS requires the user to grant location permission and normally requires HTTPS (GitHub Pages provides HTTPS) or localhost.
+- If permission is declined, users can choose locations manually from the Andhra Pradesh/Telangana list.
+- The embedded map uses OpenStreetMap. The displayed route distance is an estimate based on coordinates, not a routing-engine result; actual road distance can differ.
+- This front-end does not track the device continuously, track a real driver, dispatch vehicles, process payments, or save bookings to a backend. It is a prototype, not a production transport service.
