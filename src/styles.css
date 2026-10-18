@@ -39,3 +39,23 @@
 @media(max-width:950px){.live-map-wrap{height:340px}}
 @media(max-width:700px){.live-map-wrap{height:320px}.place-list{grid-template-columns:1fr 1fr}.distance-note{align-items:flex-start}}
 @media(max-width:390px){.place-list{grid-template-columns:1fr}}
+
+
+/* Demo login and signup dialog */
+.login-overlay{position:fixed;inset:0;z-index:30;background:#101b35b8;backdrop-filter:blur(5px);display:grid;place-items:center;padding:18px}
+.login-modal{position:relative;width:min(100%,430px);background:#fff;border-radius:22px;padding:30px;box-shadow:0 25px 90px #08112670;max-height:calc(100vh - 36px);overflow:auto}
+.login-close{position:absolute;right:17px;top:17px;border:0;background:#f3f5f8;color:#66728a;border-radius:9px;width:34px;height:34px;display:grid;place-items:center}
+.login-logo{width:48px;height:48px;background:var(--green);border-radius:15px;display:grid;place-items:center;color:var(--navy);margin-bottom:22px}
+.login-modal .eyebrow{color:#68963b;margin-bottom:8px}
+.login-modal h2{font:800 25px/1.2 Manrope,sans-serif;letter-spacing:-.8px;color:var(--navy);margin:0}
+.login-subtitle{font-size:12px;line-height:1.7;color:#8490a4;margin:10px 0 22px}
+.login-form{display:grid;gap:14px}
+.login-form label{display:grid;gap:7px;font-size:11px;font-weight:800;color:#46516a}
+.login-form input{width:100%;padding:13px 12px;border:1px solid #e3e7ef;border-radius:10px;outline:none;font-size:12px;color:var(--navy);background:#fff}
+.login-form input:focus{border-color:#a6df6b;box-shadow:0 0 0 3px #baf56a30}
+.login-form .primary-button{margin-top:3px}
+.login-switch{text-align:center;font-size:11px;color:#7e899d;margin:19px 0 0}
+.login-switch button{border:0;background:none;color:#557f2d;font-size:11px;font-weight:800;padding:0 3px}
+.login-disclaimer{display:flex;align-items:flex-start;gap:7px;background:#f7f9fc;border-radius:9px;padding:10px;margin:17px 0 0;color:#8b95a7;font-size:9px;line-height:1.6}
+.login-disclaimer svg{flex-shrink:0;color:#6c9b3c;margin-top:1px}
+@media(max-width:700px){.login-modal{padding:25px 21px;border-radius:18px}.login-modal h2{font-size:23px}}
