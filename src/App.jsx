@@ -187,11 +187,36 @@ function distanceKm(a, b) {
   const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
   return Math.max(1, Math.round(6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)) * 1.25));
 }
-function mapUrl(point) {
+function mapBounds(point, start, end) {
+  if (start && end) {
+    const lonPad = Math.max(0.045, Math.abs(end.lon - start.lon) * 0.22);
+    const latPad = Math.max(0.035, Math.abs(end.lat - start.lat) * 0.22);
+    return {
+      minLon: Math.min(start.lon, end.lon) - lonPad,
+      maxLon: Math.max(start.lon, end.lon) + lonPad,
+      minLat: Math.min(start.lat, end.lat) - latPad,
+      maxLat: Math.max(start.lat, end.lat) + latPad
+    };
+  }
   const p = point || places[0];
-  const delta = 0.09;
-  const bbox = [p.lon - delta, p.lat - delta, p.lon + delta, p.lat + delta].join('%2C');
-  return 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + p.lat + '%2C' + p.lon;
+  return { minLon: p.lon - 0.09, maxLon: p.lon + 0.09, minLat: p.lat - 0.09, maxLat: p.lat + 0.09 };
+}
+function mapUrl(point, start, end) {
+  const bounds = mapBounds(point, start, end);
+  const bbox = [bounds.minLon, bounds.minLat, bounds.maxLon, bounds.maxLat].join('%2C');
+  const markers = start && end
+    ? '&marker=' + start.lat + '%2C' + start.lon + '&marker=' + end.lat + '%2C' + end.lon
+    : '&marker=' + (point || places[0]).lat + '%2C' + (point || places[0]).lon;
+  return 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik' + markers;
+}
+function routeLine(start, end, point) {
+  if (!start || !end) return null;
+  const b = mapBounds(point, start, end);
+  const x1 = ((start.lon - b.minLon) / (b.maxLon - b.minLon)) * 100;
+  const x2 = ((end.lon - b.minLon) / (b.maxLon - b.minLon)) * 100;
+  const y1 = (1 - (start.lat - b.minLat) / (b.maxLat - b.minLat)) * 100;
+  const y2 = (1 - (end.lat - b.minLat) / (b.maxLat - b.minLat)) * 100;
+  return { x1, y1, x2, y2 };
 }
 
 export default function App() {
@@ -220,7 +245,13 @@ export default function App() {
   const selectedRide = options.find(o => o.id === ride) || options[0];
   const pickupPlace = findPlace(pickup);
   const destinationPlace = findPlace(destination);
-  const mapPoint = gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]);
+  const routeStart = pickupPlace || (gps && pickup.toLowerCase().includes('current location') ? gps : null);
+  const routeEnd = destinationPlace;
+  const routeMidpoint = routeStart && routeEnd
+    ? { lat: (routeStart.lat + routeEnd.lat) / 2, lon: (routeStart.lon + routeEnd.lon) / 2, name: 'Route overview' }
+    : null;
+  const mapPoint = routeMidpoint || (gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]));
+  const routeCoordinates = routeLine(routeStart, routeEnd, mapPoint);
   const calculatedDistance = distanceKm(pickupPlace, destinationPlace);
   const effectiveDistance = calculatedDistance || distance;
   const fare = useMemo(() => {
@@ -413,8 +444,8 @@ export default function App() {
           </div>
           <div className="map-panel">
             <div className="map-topline"><div><span className="live-dot"></span> REGIONAL MAP <small>· OPENSTREETMAP</small></div><button onClick={useCurrentLocation}><LocateFixed size={15}/> Locate me</button></div>
-            <div className="live-map-wrap"><iframe title="Interactive map for selected Andhra Pradesh or Telangana location" src={mapUrl(mapPoint)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /><a className="open-map-link" href={'https://www.openstreetmap.org/?mlat=' + mapPoint.lat + '&mlon=' + mapPoint.lon + '#map=13/' + mapPoint.lat + '/' + mapPoint.lon} target="_blank" rel="noreferrer">Open full map <ArrowRight size={13}/></a></div>
-            <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location'}</strong><span>{gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Select a destination to move the map'}</span></div><div className="nearby-count"><strong>{gps ? 'GPS' : 'MAP'}</strong><span>{gps ? 'detected' : 'interactive'}</span></div></div>
+            <div className="live-map-wrap"><iframe title="Interactive map showing the selected ride route" src={mapUrl(mapPoint, routeStart, routeEnd)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />{routeCoordinates && <svg className="route-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label={'Estimated route from ' + pickup + ' to ' + destination}><line x1={routeCoordinates.x1} y1={routeCoordinates.y1} x2={routeCoordinates.x2} y2={routeCoordinates.y2} className="route-blue-line"/><circle cx={routeCoordinates.x1} cy={routeCoordinates.y1} r="1.7" className="route-start-dot"/><circle cx={routeCoordinates.x2} cy={routeCoordinates.y2} r="1.7" className="route-end-dot"/></svg>}{routeCoordinates && <div className="route-map-pill"><Route size={13}/> {effectiveDistance} km · {money(fare)} est.</div>}<a className="open-map-link" href={routeStart && routeEnd ? 'https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=' + routeStart.lat + '%2C' + routeStart.lon + '%3B' + routeEnd.lat + '%2C' + routeEnd.lon : 'https://www.openstreetmap.org/?mlat=' + mapPoint.lat + '&mlon=' + mapPoint.lon + '#map=13/' + mapPoint.lat + '/' + mapPoint.lon} target="_blank" rel="noreferrer">Open directions <ArrowRight size={13}/></a></div>
+            <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{routeStart && routeEnd ? pickup + ' → ' + destination : (gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location')}</strong><span>{routeCoordinates ? 'Blue line marks an approximate straight-line route; use directions for road routing' : gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Choose pickup and destination to preview a route'}</span></div><div className="nearby-count"><strong>{routeCoordinates ? effectiveDistance + ' km' : gps ? 'GPS' : 'MAP'}</strong><span>{routeCoordinates ? money(fare) + ' est. fare' : gps ? 'detected' : 'interactive'}</span></div></div>
             <div className="map-benefits"><div><span className="benefit-icon"><Crosshair size={18}/></span><strong>Device location</strong><small>Permission required</small></div><div><span className="benefit-icon"><MapPin size={18}/></span><strong>Regional places</strong><small>Tamil Nadu, AP and Telangana</small></div><div><span className="benefit-icon"><Route size={18}/></span><strong>Route estimate</strong><small>Not turn-by-turn</small></div></div>
           </div>
         </section>
