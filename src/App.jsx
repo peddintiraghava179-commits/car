@@ -31,7 +31,18 @@ const places = [
   { name: 'Ongole, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.5057, lon: 80.0499 },
   { name: 'Srikakulam, Andhra Pradesh', city: 'Andhra Pradesh', lat: 18.2949, lon: 83.8938 },
   { name: 'Chittoor, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.2172, lon: 79.1003 },
-  { name: 'Amaravati, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5745, lon: 80.3598 }
+  { name: 'Amaravati, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5745, lon: 80.3598 },
+  { name: 'Palakollu, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5167, lon: 81.7300 },
+  { name: 'Bhimavaram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5449, lon: 81.5212 },
+  { name: 'Amalapuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5787, lon: 82.0061 },
+  { name: 'Tanuku, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.7544, lon: 81.6810 },
+  { name: 'Tadepalligudem, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.8147, lon: 81.5260 },
+  { name: 'Narasapuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.4343, lon: 81.6985 },
+  { name: 'Mandapeta, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.8625, lon: 81.9292 },
+  { name: 'Ravulapalem, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.7610, lon: 81.8310 },
+  { name: 'Kovvur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.0162, lon: 81.7294 },
+  { name: 'Jangareddygudem, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.1223, lon: 81.2900 },
+  { name: 'Malkipuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5200, lon: 82.0000 }
 ];
 
 const rideOptions = {
