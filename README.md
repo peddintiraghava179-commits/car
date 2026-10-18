@@ -1,12 +1,12 @@
 # RideWave — Cab & Bike Booking Prototype
 
-Responsive React + Vite ride-booking demo focused on Andhra Pradesh and Telangana.
+Responsive React + Vite ride-booking demo focused on Tamil Nadu, Andhra Pradesh and Telangana.
 
 ## Features
 - Switch between bike/scooter and cab/mini/sedan/XL ride options.
 - Browser geolocation using the device's GPS/location permission to fill the pickup field.
 - Interactive OpenStreetMap embed that centers on the selected regional place or detected GPS coordinates.
-- Regional destination list with 36 cities/towns across Telangana and Andhra Pradesh, including Hyderabad, Visakhapatnam, Vijayawada, Palakollu, Bhimavaram, Amalapuram, Tanuku, Tadepalligudem, Narasapuram, Mandapeta, Ravulapalem, and more.
+- Regional destination list with 148 listed cities and towns across Tamil Nadu, Andhra Pradesh and Telangana, including Chennai, Coimbatore, Madurai, Hyderabad, Vijayawada, Visakhapatnam, Palakollu, Bhimavaram, Amalapuram, and many other regional locations.
 - Estimated trip distance when both selected places are in the regional place list, plus estimated fares.
 - Pickup/destination fields, ride timing and payment-method selectors, booking summary, and sample ride history.
 - Sign-in and create-account modal with email/name fields; a demo profile is remembered in this browser using localStorage.
