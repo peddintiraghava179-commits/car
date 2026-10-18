@@ -42,7 +42,120 @@ const places = [
   { name: 'Ravulapalem, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.7610, lon: 81.8310 },
   { name: 'Kovvur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.0162, lon: 81.7294 },
   { name: 'Jangareddygudem, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.1223, lon: 81.2900 },
-  { name: 'Malkipuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5200, lon: 82.0000 }
+  { name: 'Malkipuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5200, lon: 82.0000 },
+  { name: 'Sangareddy, Telangana', city: 'Telangana', lat: 17.6248, lon: 78.0867 },
+  { name: 'Medak, Telangana', city: 'Telangana', lat: 18.0453, lon: 78.2608 },
+  { name: 'Mancherial, Telangana', city: 'Telangana', lat: 18.8756, lon: 79.4591 },
+  { name: 'Ramagundam, Telangana', city: 'Telangana', lat: 18.755, lon: 79.474 },
+  { name: 'Kothagudem, Telangana', city: 'Telangana', lat: 17.551, lon: 80.6178 },
+  { name: 'Suryapet, Telangana', city: 'Telangana', lat: 17.1405, lon: 79.6236 },
+  { name: 'Miryalaguda, Telangana', city: 'Telangana', lat: 16.8722, lon: 79.5625 },
+  { name: 'Jagtial, Telangana', city: 'Telangana', lat: 18.7947, lon: 78.9138 },
+  { name: 'Kamareddy, Telangana', city: 'Telangana', lat: 18.32, lon: 78.3418 },
+  { name: 'Bodhan, Telangana', city: 'Telangana', lat: 18.6621, lon: 77.8858 },
+  { name: 'Wanaparthy, Telangana', city: 'Telangana', lat: 16.3623, lon: 78.0622 },
+  { name: 'Nagarkurnool, Telangana', city: 'Telangana', lat: 16.4821, lon: 78.3247 },
+  { name: 'Vikarabad, Telangana', city: 'Telangana', lat: 17.3381, lon: 77.9044 },
+  { name: 'Bhongir, Telangana', city: 'Telangana', lat: 17.5154, lon: 78.8856 },
+  { name: 'Jangaon, Telangana', city: 'Telangana', lat: 17.726, lon: 79.1524 },
+  { name: 'Mahabubabad, Telangana', city: 'Telangana', lat: 17.5973, lon: 80.002 },
+  { name: 'Asifabad, Telangana', city: 'Telangana', lat: 19.3585, lon: 79.285 },
+  { name: 'Nirmal, Telangana', city: 'Telangana', lat: 19.0964, lon: 78.3446 },
+  { name: 'Banswada, Telangana', city: 'Telangana', lat: 18.3773, lon: 77.88 },
+  { name: 'Huzurabad, Telangana', city: 'Telangana', lat: 18.2, lon: 79.4 },
+  { name: 'Srikalahasti, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.7498, lon: 79.6984 },
+  { name: 'Madanapalle, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.5503, lon: 78.5029 },
+  { name: 'Hindupur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.8281, lon: 77.4914 },
+  { name: 'Dharmavaram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.4144, lon: 77.7197 },
+  { name: 'Proddatur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.7502, lon: 78.5481 },
+  { name: 'Pulivendula, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.421, lon: 78.225 },
+  { name: 'Nandyal, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.4779, lon: 78.4836 },
+  { name: 'Adoni, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.6322, lon: 77.2728 },
+  { name: 'Yemmiganur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.773, lon: 77.483 },
+  { name: 'Machilipatnam, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.1875, lon: 81.1389 },
+  { name: 'Tenali, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.2395, lon: 80.647 },
+  { name: 'Narasaraopet, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.235, lon: 80.049 },
+  { name: 'Chilakaluripet, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.0892, lon: 80.1672 },
+  { name: 'Bapatla, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.9044, lon: 80.4675 },
+  { name: 'Repalle, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.0184, lon: 80.829 },
+  { name: 'Gudivada, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.4355, lon: 80.9956 },
+  { name: 'Nuzvid, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.788, lon: 80.845 },
+  { name: 'Jaggayyapeta, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.8938, lon: 80.097 },
+  { name: 'Tuni, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.359, lon: 82.546 },
+  { name: 'Pithapuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.1168, lon: 82.252 },
+  { name: 'Peddapuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.077, lon: 82.138 },
+  { name: 'Anakapalle, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.6913, lon: 83.0039 },
+  { name: 'Vizianagaram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 18.1067, lon: 83.3956 },
+  { name: 'Palasa, Andhra Pradesh', city: 'Andhra Pradesh', lat: 18.7726, lon: 84.41 },
+  { name: 'Parvathipuram, Andhra Pradesh', city: 'Andhra Pradesh', lat: 18.783, lon: 83.425 },
+  { name: 'Rayachoti, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.0572, lon: 78.75 },
+  { name: 'Rajampet, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.195, lon: 79.16 },
+  { name: 'Kandukur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.215, lon: 79.904 },
+  { name: 'Markapur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.735, lon: 79.268 },
+  { name: 'Ponnur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.071, lon: 80.55 },
+  { name: 'Mangalagiri, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.43, lon: 80.568 },
+  { name: 'Gudur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.15, lon: 79.85 },
+  { name: 'Chennai, Tamil Nadu', city: 'Tamil Nadu', lat: 13.0827, lon: 80.2707 },
+  { name: 'Coimbatore, Tamil Nadu', city: 'Tamil Nadu', lat: 11.0168, lon: 76.9558 },
+  { name: 'Madurai, Tamil Nadu', city: 'Tamil Nadu', lat: 9.9252, lon: 78.1198 },
+  { name: 'Tiruchirappalli, Tamil Nadu', city: 'Tamil Nadu', lat: 10.7905, lon: 78.7047 },
+  { name: 'Salem, Tamil Nadu', city: 'Tamil Nadu', lat: 11.6643, lon: 78.146 },
+  { name: 'Tiruppur, Tamil Nadu', city: 'Tamil Nadu', lat: 11.1085, lon: 77.3411 },
+  { name: 'Erode, Tamil Nadu', city: 'Tamil Nadu', lat: 11.341, lon: 77.7172 },
+  { name: 'Vellore, Tamil Nadu', city: 'Tamil Nadu', lat: 12.9165, lon: 79.1325 },
+  { name: 'Thoothukudi, Tamil Nadu', city: 'Tamil Nadu', lat: 8.7642, lon: 78.1348 },
+  { name: 'Tirunelveli, Tamil Nadu', city: 'Tamil Nadu', lat: 8.7139, lon: 77.7567 },
+  { name: 'Dindigul, Tamil Nadu', city: 'Tamil Nadu', lat: 10.3673, lon: 77.9803 },
+  { name: 'Thanjavur, Tamil Nadu', city: 'Tamil Nadu', lat: 10.787, lon: 79.1378 },
+  { name: 'Ranipet, Tamil Nadu', city: 'Tamil Nadu', lat: 12.9247, lon: 79.3333 },
+  { name: 'Kancheepuram, Tamil Nadu', city: 'Tamil Nadu', lat: 12.8342, lon: 79.7036 },
+  { name: 'Tiruvallur, Tamil Nadu', city: 'Tamil Nadu', lat: 13.1437, lon: 79.9089 },
+  { name: 'Cuddalore, Tamil Nadu', city: 'Tamil Nadu', lat: 11.748, lon: 79.7714 },
+  { name: 'Villupuram, Tamil Nadu', city: 'Tamil Nadu', lat: 11.9401, lon: 79.4861 },
+  { name: 'Nagapattinam, Tamil Nadu', city: 'Tamil Nadu', lat: 10.7672, lon: 79.8449 },
+  { name: 'Tiruvarur, Tamil Nadu', city: 'Tamil Nadu', lat: 10.7727, lon: 79.6368 },
+  { name: 'Sivaganga, Tamil Nadu', city: 'Tamil Nadu', lat: 9.8433, lon: 78.4809 },
+  { name: 'Ramanathapuram, Tamil Nadu', city: 'Tamil Nadu', lat: 9.3639, lon: 78.8395 },
+  { name: 'Virudhunagar, Tamil Nadu', city: 'Tamil Nadu', lat: 9.568, lon: 77.9624 },
+  { name: 'Tenkasi, Tamil Nadu', city: 'Tamil Nadu', lat: 8.959, lon: 77.3152 },
+  { name: 'Kanniyakumari, Tamil Nadu', city: 'Tamil Nadu', lat: 8.0883, lon: 77.5385 },
+  { name: 'Nagercoil, Tamil Nadu', city: 'Tamil Nadu', lat: 8.1833, lon: 77.4119 },
+  { name: 'Hosur, Tamil Nadu', city: 'Tamil Nadu', lat: 12.7409, lon: 77.8253 },
+  { name: 'Krishnagiri, Tamil Nadu', city: 'Tamil Nadu', lat: 12.5186, lon: 78.2137 },
+  { name: 'Dharmapuri, Tamil Nadu', city: 'Tamil Nadu', lat: 12.1211, lon: 78.1582 },
+  { name: 'Namakkal, Tamil Nadu', city: 'Tamil Nadu', lat: 11.2189, lon: 78.1677 },
+  { name: 'Karur, Tamil Nadu', city: 'Tamil Nadu', lat: 10.9601, lon: 78.0766 },
+  { name: 'Perambalur, Tamil Nadu', city: 'Tamil Nadu', lat: 11.2342, lon: 78.8807 },
+  { name: 'Ariyalur, Tamil Nadu', city: 'Tamil Nadu', lat: 11.1401, lon: 79.0786 },
+  { name: 'Pudukkottai, Tamil Nadu', city: 'Tamil Nadu', lat: 10.3833, lon: 78.8001 },
+  { name: 'Pollachi, Tamil Nadu', city: 'Tamil Nadu', lat: 10.6583, lon: 77.0085 },
+  { name: 'Ooty, Tamil Nadu', city: 'Tamil Nadu', lat: 11.4102, lon: 76.695 },
+  { name: 'Coonoor, Tamil Nadu', city: 'Tamil Nadu', lat: 11.353, lon: 76.7959 },
+  { name: 'Kumbakonam, Tamil Nadu', city: 'Tamil Nadu', lat: 10.9602, lon: 79.3845 },
+  { name: 'Mayiladuthurai, Tamil Nadu', city: 'Tamil Nadu', lat: 11.1018, lon: 79.6528 },
+  { name: 'Chengalpattu, Tamil Nadu', city: 'Tamil Nadu', lat: 12.6819, lon: 79.9888 },
+  { name: 'Tiruvannamalai, Tamil Nadu', city: 'Tamil Nadu', lat: 12.2253, lon: 79.0747 },
+  { name: 'Arakkonam, Tamil Nadu', city: 'Tamil Nadu', lat: 13.084, lon: 79.67 },
+  { name: 'Ambur, Tamil Nadu', city: 'Tamil Nadu', lat: 12.7916, lon: 78.7164 },
+  { name: 'Gudiyatham, Tamil Nadu', city: 'Tamil Nadu', lat: 12.946, lon: 78.87 },
+  { name: 'Sivakasi, Tamil Nadu', city: 'Tamil Nadu', lat: 9.4533, lon: 77.797 },
+  { name: 'Rajapalayam, Tamil Nadu', city: 'Tamil Nadu', lat: 9.452, lon: 77.553 },
+  { name: 'Kovilpatti, Tamil Nadu', city: 'Tamil Nadu', lat: 9.1717, lon: 77.8699 },
+  { name: 'Mettupalayam, Tamil Nadu', city: 'Tamil Nadu', lat: 11.2997, lon: 76.9348 },
+  { name: 'Pallavaram, Tamil Nadu', city: 'Tamil Nadu', lat: 12.9675, lon: 80.1491 },
+  { name: 'Tambaram, Tamil Nadu', city: 'Tamil Nadu', lat: 12.9249, lon: 80.1 },
+  { name: 'Avadi, Tamil Nadu', city: 'Tamil Nadu', lat: 13.1147, lon: 80.1098 },
+  { name: 'Tiruchengode, Tamil Nadu', city: 'Tamil Nadu', lat: 11.38, lon: 77.894 },
+  { name: 'Udumalaipettai, Tamil Nadu', city: 'Tamil Nadu', lat: 10.5881, lon: 77.2478 },
+  { name: 'Ramanathapuram, Tamil Nadu', city: 'Tamil Nadu', lat: 9.3639, lon: 78.8395 },
+  { name: 'Paramakudi, Tamil Nadu', city: 'Tamil Nadu', lat: 9.546, lon: 78.591 },
+  { name: 'Karaikudi, Tamil Nadu', city: 'Tamil Nadu', lat: 10.0731, lon: 78.773 },
+  { name: 'Theni, Tamil Nadu', city: 'Tamil Nadu', lat: 10.0104, lon: 77.4768 },
+  { name: 'Bodinayakanur, Tamil Nadu', city: 'Tamil Nadu', lat: 10.0117, lon: 77.3497 },
+  { name: 'Palani, Tamil Nadu', city: 'Tamil Nadu', lat: 10.4503, lon: 77.5209 },
+  { name: 'Tindivanam, Tamil Nadu', city: 'Tamil Nadu', lat: 12.234, lon: 79.655 },
+  { name: 'Vaniyambadi, Tamil Nadu', city: 'Tamil Nadu', lat: 12.6816, lon: 78.62 },
+  { name: 'Poonamallee, Tamil Nadu', city: 'Tamil Nadu', lat: 13.048, lon: 80.094 }
 ];
 
 const rideOptions = {
@@ -218,7 +331,7 @@ export default function App() {
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <div className="eyebrow"><span className="live-dot"></span> ANDHRA PRADESH · TELANGANA</div>
+            <div className="eyebrow"><span className="live-dot"></span> TAMIL NADU · ANDHRA PRADESH · TELANGANA</div>
             <h1>Every journey,<br /><em>your way.</em></h1>
             <p className="hero-sub">Book a bike or cab, use your device GPS, and choose destinations across Andhra Pradesh and Telangana.</p>
             <div className="hero-points"><span><ShieldCheck size={16}/> Safer rides</span><span><Wallet size={16}/> Clear estimates</span><span><Zap size={16}/> Quick pickup</span></div>
@@ -274,7 +387,7 @@ export default function App() {
                 </div>
                 <div className="gps-status" role="status"><Crosshair size={14}/><span>{gpsStatus}</span></div>
                 <div className="regional-picker">
-                  <div className="regional-title"><Map size={15}/> Popular locations <span>AP & TS</span></div>
+                  <div className="regional-title"><Map size={15}/> Popular locations <span>TN · AP · TS</span></div>
                   <div className="region-chips">{places.slice(0, 6).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
                   <details className="all-places"><summary>Browse all {places.length} cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
@@ -308,7 +421,7 @@ export default function App() {
         </section>
 
         <section className="how-section">
-          <div className="section-intro"><p className="eyebrow">SIMPLE AS 1, 2, 3</p><h2>Good rides. <em>No guesswork.</em></h2><p>Choose a regional destination, check the map and compare estimated fares.</p></div>
+          <div className="section-intro"><p className="eyebrow">SIMPLE AS 1, 2, 3</p><h2>Good rides. <em>No guesswork.</em></h2><p>Choose destinations across Tamil Nadu, Andhra Pradesh and Telangana, check the map and compare estimated fares.</p></div>
           <div className="steps-grid"><div className="step-card"><span className="step-number">01</span><div className="step-icon"><MapPin size={23}/></div><h3>Set your route</h3><p>Enter a pickup and destination or allow GPS to detect your current location.</p></div><div className="step-card"><span className="step-number">02</span><div className="step-icon"><Bike size={24}/></div><h3>Pick your ride</h3><p>Choose a bike or a cab and compare estimated prices before booking.</p></div><div className="step-card"><span className="step-number">03</span><div className="step-icon"><Heart size={23}/></div><h3>Ride with ease</h3><p>Review the route and booking summary. Real driver dispatch is not yet connected.</p></div></div>
         </section>
 
