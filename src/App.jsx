@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import landmarks from './landmarks';
 import {
   Bike, CarFront, MapPin, Navigation, Clock3, ShieldCheck, Wallet,
   Star, ArrowRight, LocateFixed, ChevronDown, Menu, X, CheckCircle2,
@@ -174,10 +175,11 @@ const initialTrips = [
   { id: 2, from: 'Vijayawada Railway Station', to: 'Benz Circle, Vijayawada', type: 'Mini Cab', price: 214, date: '12 Oct' }
 ];
 
+const allPlaces = [...places, ...landmarks];
 function money(n) { return '₹' + Math.round(n); }
 function findPlace(value, villagePlaces = []) {
   if (!value) return null;
-  return places.find(p => p.name === value) || villagePlaces.find(p => p.name === value) || places.find(p => value.toLowerCase().includes(p.name.split(',')[0].toLowerCase())) || null;
+  return allPlaces.find(p => p.name === value) || villagePlaces.find(p => p.name === value) || allPlaces.find(p => value.toLowerCase().includes(p.name.split(',')[0].toLowerCase())) || null;
 }
 function distanceKm(a, b) {
   if (!a || !b || !Number.isFinite(a.lat) || !Number.isFinite(a.lon) || !Number.isFinite(b.lat) || !Number.isFinite(b.lon)) return null;
@@ -299,9 +301,9 @@ export default function App() {
   const activeSearchValue = activeLocationField === 'pickup' ? pickup : destination;
   const visiblePlaceOptions = useMemo(() => {
     const query = activeSearchValue.trim().toLowerCase();
-    if (!query) return places;
-    return [...places, ...villagePlaces]
-      .filter(place => place.name.toLowerCase().includes(query) || (place.pin && place.pin.includes(query)))
+    if (!query) return allPlaces;
+    return [...allPlaces, ...villagePlaces]
+      .filter(place => place.name.toLowerCase().includes(query) || (place.pin && place.pin.includes(query)) || (place.kind && place.kind.toLowerCase().includes(query)))
       .slice(0, 80);
   }, [activeSearchValue, villagePlaces]);
   const options = rideOptions[mode];
@@ -513,8 +515,8 @@ export default function App() {
                 <div className="regional-picker">
                   <div className="regional-title"><Map size={15}/> Popular locations <span>TN · AP · TS</span></div>
                   <div className="demo-note">{villageDataStatus}. Type a village name above to search the full Andhra Pradesh and Telangana directory. Village road distance may need manual adjustment; use Google Maps for directions.</div>
-                  <div className="region-chips">{places.filter(p => ['Chennai, Tamil Nadu', 'Coimbatore, Tamil Nadu', 'Hyderabad, Telangana', 'Vijayawada, Andhra Pradesh', 'Visakhapatnam, Andhra Pradesh', 'Palakollu, Andhra Pradesh'].includes(p.name)).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
-                  <details className="all-places"><summary>Browse listed cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
+                  <div className="region-chips">{allPlaces.filter(p => ['Chennai, Tamil Nadu', 'Coimbatore, Tamil Nadu', 'Hyderabad, Telangana', 'Vijayawada, Andhra Pradesh', 'Visakhapatnam, Andhra Pradesh', 'Palakollu, Andhra Pradesh'].includes(p.name)).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
+                  <details className="all-places"><summary>Browse regional cities, stations and colleges</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{allPlaces.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
                 {(pickupPlace?.isVillage || destinationPlace?.isVillage) && !(routeStart && routeEnd) && <div className="distance-note"><Route size={14}/> Village selected <span>Road distance is not verified here; adjust trip distance below and use Google Maps for directions.</span></div>}
                 {routeStart && routeEnd && <div className="distance-note"><Route size={14}/> {roadDistanceStatus || 'Calculating route distance…'}: <strong>{effectiveDistance} km</strong> <span>{roadDistance ? '(road route estimate)' : '(fallback estimate; Google Maps may show a different route)'}</span></div>}
