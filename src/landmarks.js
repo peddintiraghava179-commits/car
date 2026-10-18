@@ -76,7 +76,6 @@ const landmarks = [
   { name: 'Kadapa Airport (CDP), Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.5099, lon: 78.7728, kind: 'Airport' },
   { name: 'Kurnool Airport (KJB), Orvakal, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.4786, lon: 78.1270, kind: 'Airport' },
   { name: 'Rajiv Gandhi International Airport (HYD), Hyderabad, Telangana', city: 'Telangana', lat: 17.2403, lon: 78.4294, kind: 'Airport' },
-  { name: 'Warangal Airport, Telangana (proposed / not for normal passenger pickup)', city: 'Telangana', lat: 17.914, lon: 79.602, kind: 'Airport (proposed)' },
   { name: 'Chennai International Airport (MAA), Tamil Nadu', city: 'Tamil Nadu', lat: 12.9941, lon: 80.1709, kind: 'Airport' },
   { name: 'Coimbatore International Airport (CJB), Tamil Nadu', city: 'Tamil Nadu', lat: 11.0300, lon: 77.0434, kind: 'Airport' },
   { name: 'Madurai Airport (IXM), Tamil Nadu', city: 'Tamil Nadu', lat: 9.8345, lon: 78.0934, kind: 'Airport' },
