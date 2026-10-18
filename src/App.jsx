@@ -147,7 +147,6 @@ const places = [
   { name: 'Avadi, Tamil Nadu', city: 'Tamil Nadu', lat: 13.1147, lon: 80.1098 },
   { name: 'Tiruchengode, Tamil Nadu', city: 'Tamil Nadu', lat: 11.38, lon: 77.894 },
   { name: 'Udumalaipettai, Tamil Nadu', city: 'Tamil Nadu', lat: 10.5881, lon: 77.2478 },
-  { name: 'Ramanathapuram, Tamil Nadu', city: 'Tamil Nadu', lat: 9.3639, lon: 78.8395 },
   { name: 'Paramakudi, Tamil Nadu', city: 'Tamil Nadu', lat: 9.546, lon: 78.591 },
   { name: 'Karaikudi, Tamil Nadu', city: 'Tamil Nadu', lat: 10.0731, lon: 78.773 },
   { name: 'Theni, Tamil Nadu', city: 'Tamil Nadu', lat: 10.0104, lon: 77.4768 },
@@ -388,7 +387,7 @@ export default function App() {
                 <div className="gps-status" role="status"><Crosshair size={14}/><span>{gpsStatus}</span></div>
                 <div className="regional-picker">
                   <div className="regional-title"><Map size={15}/> Popular locations <span>TN · AP · TS</span></div>
-                  <div className="region-chips">{places.slice(0, 6).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
+                  <div className="region-chips">{places.filter(p => ['Chennai, Tamil Nadu', 'Coimbatore, Tamil Nadu', 'Hyderabad, Telangana', 'Vijayawada, Andhra Pradesh', 'Visakhapatnam, Andhra Pradesh', 'Palakollu, Andhra Pradesh'].includes(p.name)).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
                   <details className="all-places"><summary>Browse all {places.length} cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
                 {calculatedDistance && <div className="distance-note"><Route size={14}/> Approx. road-distance estimate: <strong>{calculatedDistance} km</strong> <span>(straight-line distance adjusted; actual route may vary)</span></div>}
