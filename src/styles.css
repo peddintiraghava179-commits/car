@@ -4,3 +4,38 @@
 @media(max-width:950px){.topbar{padding:0 4%;gap:20px}.hero{padding-left:5%;padding-right:5%;grid-template-columns:.9fr 1.1fr}.booking-layout{padding-left:4%;padding-right:4%;grid-template-columns:minmax(330px,.9fr) minmax(0,1.1fr);gap:15px}.booking-card{padding:21px 18px}.map-benefits{grid-template-columns:1fr;gap:12px;padding:16px 18px}.map-benefits>div{grid-template-columns:32px 1fr}.map-benefits small{font-size:8px}.how-section{padding-left:5%;padding-right:5%}.safety-banner,.app-banner{margin-left:5%;margin-right:5%}footer{padding-left:5%;padding-right:5%}.hero-art{height:270px}.floating-price{right:9px;padding:9px}.floating-price strong{font-size:16px}}
 @media(max-width:700px){.topbar{height:70px;padding:0 20px;gap:12px}.brand{font-size:21px}.brand-mark{width:34px;height:34px}.nav-links{display:none;position:absolute;z-index:8;top:69px;left:0;right:0;background:#fff;padding:14px 22px;box-shadow:0 10px 20px #17203b12;align-items:stretch;gap:7px}.nav-links.open{display:flex;flex-direction:column}.nav-link{text-align:left;padding:10px}.nav-link.active:after{display:none}.profile-button{margin-left:auto;padding:9px 10px}.profile-button span{display:none}.mobile-menu{display:block;padding:6px;color:var(--navy)}.hero{padding:42px 22px 28px;grid-template-columns:1fr;gap:25px}.hero h1{font-size:47px}.hero-sub{max-width:480px;font-size:13px}.hero-art{height:245px}.booking-layout{padding:22px 14px 42px;grid-template-columns:1fr;gap:18px}.booking-card{padding:23px 19px}.illustrated-map{height:300px}.map-benefits{grid-template-columns:repeat(3,1fr);gap:4px;padding:13px 9px}.map-benefits>div{grid-template-columns:1fr;gap:7px}.benefit-icon{grid-row:auto}.map-benefits strong{white-space:normal;font-size:9px}.map-benefits small{font-size:7px;line-height:1.4}.how-section{padding:42px 20px 46px}.section-intro h2{font-size:27px}.steps-grid{grid-template-columns:1fr;gap:10px;margin-top:25px}.step-card{padding:19px 20px}.step-icon{margin-bottom:11px}.step-card p{max-width:none}.safety-banner,.app-banner{margin:0 14px 18px;padding:20px 18px;flex-wrap:wrap;gap:12px}.safety-banner>div:nth-child(2),.app-banner>div:nth-child(2){min-width:calc(100% - 70px)}.safety-banner h2,.app-banner h2{font-size:16px}.safety-banner p:last-child,.app-banner p:last-child{font-size:9px}.safety-button,.app-banner button{margin-left:64px}.app-banner{margin-bottom:35px}footer{padding:18px 20px;flex-wrap:wrap;gap:13px}footer>span{order:3;flex-basis:100%}footer>div{gap:12px;margin-left:auto}.footer-brand{font-size:17px}.map-topline{padding:0 13px}.map-topline button{font-size:8px}.map-street{font-size:6px}}
 @media(max-width:390px){.hero h1{font-size:41px}.hero-points{gap:10px}.hero-points span{font-size:10px}.booking-card{padding:20px 14px}.ride-option{gap:7px;padding:9px 7px}.ride-option-icon{width:34px;height:35px}.ride-option-text strong{font-size:11px}.ride-option-price strong{font-size:12px}.form-bottom{grid-template-columns:1fr}.map-benefits strong{font-size:8px}.map-benefits small{font-size:6px}.safety-button,.app-banner button{margin-left:0}}
+
+
+/* GPS, regional destination selector and real interactive map */
+.gps-status{display:flex;align-items:flex-start;gap:7px;padding:9px 2px 2px;color:#71809a;font-size:10px;line-height:1.5}
+.gps-status svg{flex-shrink:0;color:#65943a;margin-top:1px}
+.gps-spinner{display:inline-block;min-width:17px;text-align:center;font-weight:800}
+.locate-button:disabled{opacity:.55;cursor:wait}
+.regional-picker{border:1px solid #e8ebf1;border-radius:12px;padding:11px;margin:8px 0 16px;background:#fbfcfe}
+.regional-title{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;color:#39455d;margin-bottom:9px}
+.regional-title svg{color:#69943e}.regional-title span{margin-left:auto;color:#7c879b;font-size:9px;font-weight:600;background:#edf5e5;border-radius:5px;padding:4px 6px}
+.region-chips{display:flex;flex-wrap:wrap;gap:6px}
+.region-chips button{border:1px solid #e4e9de;background:#fff;border-radius:7px;padding:6px 8px;font-size:9px;color:#5c6b51}
+.region-chips button:hover{background:#edf7e3;border-color:#b8dc92}
+.all-places{margin-top:10px;border-top:1px solid #edf0f5;padding-top:9px}
+.all-places summary{font-size:10px;font-weight:700;color:#65738a;cursor:pointer}
+.place-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.place-list>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.place-list>div>strong{font-size:10px;color:#5e8c34;margin-bottom:3px}
+.place-list button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:0;background:#fff;border-radius:6px;padding:7px;text-align:left;font-size:10px;color:#34405a}
+.place-list button:hover{background:#f0f7e8}
+.place-list button span{font-size:8px;color:#8b95a8}
+.distance-note{display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:#f5f9ef;border-radius:8px;padding:9px;margin:-4px 0 15px;font-size:10px;color:#63734f}
+.distance-note svg{color:#63913a;flex-shrink:0}.distance-note strong{color:#344d24}.distance-note span{font-size:9px;color:#8b95a8}
+.live-map-wrap{height:365px;position:relative;background:#eef1e9}
+.live-map-wrap iframe{width:100%;height:100%;border:0;display:block}
+.open-map-link{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:5px;padding:8px 10px;background:#fff;color:#34405a;border-radius:8px;font-size:10px;font-weight:700;box-shadow:0 2px 12px #17203b20}
+.map-location-caption{display:flex;align-items:center;padding:15px 19px;gap:11px;border-bottom:1px solid #eef0f5}
+.map-location-caption>div:nth-child(2){display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.map-location-caption>div:nth-child(2) strong{font-size:11px;overflow-wrap:anywhere}
+.map-location-caption>div:nth-child(2) span,.map-location-caption .nearby-count span{font-size:9px;color:#8993a6}
+.map-location-caption .nearby-count{text-align:right;display:flex;flex-direction:column;gap:3px}
+.map-location-caption .nearby-count strong{font:800 13px Manrope;color:#5e8c34}
+@media(max-width:950px){.live-map-wrap{height:340px}}
+@media(max-width:700px){.live-map-wrap{height:320px}.place-list{grid-template-columns:1fr 1fr}.distance-note{align-items:flex-start}}
+@media(max-width:390px){.place-list{grid-template-columns:1fr}}
