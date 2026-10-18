@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Bike, CarFront, MapPin, Navigation, Clock3, ShieldCheck, Wallet,
   Star, ArrowRight, LocateFixed, ChevronDown, Menu, X, CheckCircle2,
@@ -202,12 +202,20 @@ function mapBounds(point, start, end) {
   return { minLon: p.lon - 0.09, maxLon: p.lon + 0.09, minLat: p.lat - 0.09, maxLat: p.lat + 0.09 };
 }
 function mapUrl(point, start, end) {
-  const bounds = mapBounds(point, start, end);
-  const bbox = [bounds.minLon, bounds.minLat, bounds.maxLon, bounds.maxLat].join('%2C');
-  const markers = start && end
-    ? '&marker=' + start.lat + '%2C' + start.lon + '&marker=' + end.lat + '%2C' + end.lon
-    : '&marker=' + (point || places[0]).lat + '%2C' + (point || places[0]).lon;
-  return 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik' + markers;
+  if (start && end) {
+    return 'https://www.google.com/maps?output=embed&saddr=' +
+      encodeURIComponent(start.lat + ',' + start.lon) + '&daddr=' +
+      encodeURIComponent(end.lat + ',' + end.lon);
+  }
+  const p = point || places[0];
+  return 'https://www.google.com/maps?q=' + encodeURIComponent(p.lat + ',' + p.lon) + '&output=embed';
+}
+function googleDirectionsUrl(start, end, pickupName, destinationName, mode) {
+  const origin = start ? start.lat + ',' + start.lon : pickupName;
+  const destination = end ? end.lat + ',' + end.lon : destinationName;
+  const travelmode = mode === 'bike' ? 'two-wheeler' : 'driving';
+  return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) +
+    '&destination=' + encodeURIComponent(destination) + '&travelmode=' + travelmode;
 }
 function routeLine(start, end, point) {
   if (!start || !end) return null;
@@ -241,6 +249,8 @@ export default function App() {
   const [gps, setGps] = useState(null);
   const [gpsStatus, setGpsStatus] = useState('Use GPS to detect your current position');
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [roadDistance, setRoadDistance] = useState(null);
+  const [roadDistanceStatus, setRoadDistanceStatus] = useState('');
   const options = rideOptions[mode];
   const selectedRide = options.find(o => o.id === ride) || options[0];
   const pickupPlace = findPlace(pickup);
@@ -253,7 +263,38 @@ export default function App() {
   const mapPoint = routeMidpoint || (gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]));
   const routeCoordinates = routeLine(routeStart, routeEnd, mapPoint);
   const calculatedDistance = distanceKm(routeStart, destinationPlace);
-  const effectiveDistance = calculatedDistance || distance;
+  useEffect(() => {
+    let active = true;
+    setRoadDistance(null);
+    if (!routeStart || !routeEnd) {
+      setRoadDistanceStatus('');
+      return () => { active = false; };
+    }
+    setRoadDistanceStatus('Finding road distance…');
+    const url = 'https://router.project-osrm.org/route/v1/driving/' +
+      routeStart.lon + ',' + routeStart.lat + ';' + routeEnd.lon + ',' + routeEnd.lat +
+      '?overview=false&alternatives=false&steps=false';
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error('Road route unavailable');
+        return response.json();
+      })
+      .then(data => {
+        if (!active) return;
+        const meters = data && data.routes && data.routes[0] && data.routes[0].distance;
+        if (data.code === 'Ok' && Number.isFinite(meters) && meters > 0) {
+          setRoadDistance(Math.max(1, Math.round(meters / 1000 * 10) / 10));
+          setRoadDistanceStatus('Estimated road distance');
+        } else {
+          setRoadDistanceStatus('Approximate distance · road route unavailable');
+        }
+      })
+      .catch(() => {
+        if (active) setRoadDistanceStatus('Approximate distance · road route unavailable');
+      });
+    return () => { active = false; };
+  }, [routeStart && routeStart.lat, routeStart && routeStart.lon, routeEnd && routeEnd.lat, routeEnd && routeEnd.lon]);
+  const effectiveDistance = roadDistance || calculatedDistance || distance;
   const fare = useMemo(() => {
     const base = mode === 'bike' ? 25 : 55;
     return base + effectiveDistance * (mode === 'bike' ? 9 : 15) * selectedRide.multiplier;
@@ -421,7 +462,7 @@ export default function App() {
                   <div className="region-chips">{places.filter(p => ['Chennai, Tamil Nadu', 'Coimbatore, Tamil Nadu', 'Hyderabad, Telangana', 'Vijayawada, Andhra Pradesh', 'Visakhapatnam, Andhra Pradesh', 'Palakollu, Andhra Pradesh'].includes(p.name)).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
                   <details className="all-places"><summary>Browse all {places.length} cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
-                {calculatedDistance && <div className="distance-note"><Route size={14}/> Approx. road-distance estimate: <strong>{calculatedDistance} km</strong> <span>(straight-line distance adjusted; actual route may vary)</span></div>}
+                {routeStart && routeEnd && <div className="distance-note"><Route size={14}/> {roadDistanceStatus || 'Calculating route distance…'}: <strong>{effectiveDistance} km</strong> <span>{roadDistance ? '(road route estimate)' : '(fallback estimate; Google Maps may show a different route)'}</span></div>}
                 <div className="section-label"><span>Choose your ride</span><span className="muted">Estimated pickup</span></div>
                 <div className="ride-options">
                   {options.map(opt => {
@@ -444,8 +485,8 @@ export default function App() {
           </div>
           <div className="map-panel">
             <div className="map-topline"><div><span className="live-dot"></span> REGIONAL MAP <small>· OPENSTREETMAP</small></div><button onClick={useCurrentLocation}><LocateFixed size={15}/> Locate me</button></div>
-            <div className="live-map-wrap"><iframe title="Interactive map showing the selected ride route" src={mapUrl(mapPoint, routeStart, routeEnd)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />{routeCoordinates && <svg className="route-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label={'Estimated route from ' + pickup + ' to ' + destination}><line x1={routeCoordinates.x1} y1={routeCoordinates.y1} x2={routeCoordinates.x2} y2={routeCoordinates.y2} className="route-blue-line"/><circle cx={routeCoordinates.x1} cy={routeCoordinates.y1} r="1.7" className="route-start-dot"/><circle cx={routeCoordinates.x2} cy={routeCoordinates.y2} r="1.7" className="route-end-dot"/></svg>}{routeCoordinates && <div className="route-map-pill"><Route size={13}/> {effectiveDistance} km · {money(fare)} est.</div>}<a className="open-map-link" href={routeStart && routeEnd ? 'https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=' + routeStart.lat + '%2C' + routeStart.lon + '%3B' + routeEnd.lat + '%2C' + routeEnd.lon : 'https://www.openstreetmap.org/?mlat=' + mapPoint.lat + '&mlon=' + mapPoint.lon + '#map=13/' + mapPoint.lat + '/' + mapPoint.lon} target="_blank" rel="noreferrer">Open directions <ArrowRight size={13}/></a></div>
-            <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{routeStart && routeEnd ? pickup + ' → ' + destination : (gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location')}</strong><span>{routeCoordinates ? 'Blue line marks an approximate straight-line route; use directions for road routing' : gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Choose pickup and destination to preview a route'}</span></div><div className="nearby-count"><strong>{routeCoordinates ? effectiveDistance + ' km' : gps ? 'GPS' : 'MAP'}</strong><span>{routeCoordinates ? money(fare) + ' est. fare' : gps ? 'detected' : 'interactive'}</span></div></div>
+            <div className="live-map-wrap"><iframe title="Google Maps showing the selected ride route" src={mapUrl(mapPoint, routeStart, routeEnd)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />{routeCoordinates && <div className="route-map-pill"><Route size={13}/> {effectiveDistance} km · {money(fare)} est.</div>}<a className="open-map-link" href={routeStart && routeEnd ? googleDirectionsUrl(routeStart, routeEnd, pickup, destination, mode) : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapPoint.name || (mapPoint.lat + ',' + mapPoint.lon))} target="_blank" rel="noreferrer">Open in Google Maps <ArrowRight size={13}/></a></div>
+            <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{routeStart && routeEnd ? pickup + ' → ' + destination : (gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location')}</strong><span>{routeCoordinates ? 'Google Maps route preview · road distance updates when available' : gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Choose pickup and destination to preview a route'}</span></div><div className="nearby-count"><strong>{routeCoordinates ? effectiveDistance + ' km' : gps ? 'GPS' : 'MAP'}</strong><span>{routeCoordinates ? money(fare) + ' est. fare' : gps ? 'detected' : 'interactive'}</span></div></div>
             <div className="map-benefits"><div><span className="benefit-icon"><Crosshair size={18}/></span><strong>Device location</strong><small>Permission required</small></div><div><span className="benefit-icon"><MapPin size={18}/></span><strong>Regional places</strong><small>Tamil Nadu, AP and Telangana</small></div><div><span className="benefit-icon"><Route size={18}/></span><strong>Route estimate</strong><small>Not turn-by-turn</small></div></div>
           </div>
         </section>
