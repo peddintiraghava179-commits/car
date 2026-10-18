@@ -3,8 +3,36 @@ import {
   Bike, CarFront, MapPin, Navigation, Clock3, ShieldCheck, Wallet,
   Star, ArrowRight, LocateFixed, ChevronDown, Menu, X, CheckCircle2,
   Route, CircleUserRound, CalendarClock, Headphones, Zap, Heart, Plus,
-  Minus, Smartphone, MapPinned
+  Minus, Smartphone, MapPinned, Crosshair, Map
 } from 'lucide-react';
+
+const places = [
+  { name: 'Hyderabad, Telangana', city: 'Telangana', lat: 17.385, lon: 78.4867 },
+  { name: 'Secunderabad, Telangana', city: 'Telangana', lat: 17.4399, lon: 78.4983 },
+  { name: 'Warangal, Telangana', city: 'Telangana', lat: 17.9689, lon: 79.5941 },
+  { name: 'Karimnagar, Telangana', city: 'Telangana', lat: 18.4386, lon: 79.1288 },
+  { name: 'Nizamabad, Telangana', city: 'Telangana', lat: 18.6725, lon: 78.0941 },
+  { name: 'Khammam, Telangana', city: 'Telangana', lat: 17.2473, lon: 80.1514 },
+  { name: 'Mahbubnagar, Telangana', city: 'Telangana', lat: 16.7488, lon: 78.0035 },
+  { name: 'Nalgonda, Telangana', city: 'Telangana', lat: 17.0575, lon: 79.2684 },
+  { name: 'Siddipet, Telangana', city: 'Telangana', lat: 18.1018, lon: 78.852 },
+  { name: 'Adilabad, Telangana', city: 'Telangana', lat: 19.6641, lon: 78.532 },
+  { name: 'Visakhapatnam, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.6868, lon: 83.2185 },
+  { name: 'Vijayawada, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5062, lon: 80.648 },
+  { name: 'Guntur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.3067, lon: 80.4365 },
+  { name: 'Tirupati, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.6288, lon: 79.4192 },
+  { name: 'Kurnool, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.8281, lon: 78.0373 },
+  { name: 'Rajahmundry, Andhra Pradesh', city: 'Andhra Pradesh', lat: 17.0005, lon: 81.804 },
+  { name: 'Kakinada, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.9891, lon: 82.2475 },
+  { name: 'Nellore, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.4426, lon: 79.9865 },
+  { name: 'Kadapa, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.4673, lon: 78.8242 },
+  { name: 'Anantapur, Andhra Pradesh', city: 'Andhra Pradesh', lat: 14.6819, lon: 77.6006 },
+  { name: 'Eluru, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.7107, lon: 81.0952 },
+  { name: 'Ongole, Andhra Pradesh', city: 'Andhra Pradesh', lat: 15.5057, lon: 80.0499 },
+  { name: 'Srikakulam, Andhra Pradesh', city: 'Andhra Pradesh', lat: 18.2949, lon: 83.8938 },
+  { name: 'Chittoor, Andhra Pradesh', city: 'Andhra Pradesh', lat: 13.2172, lon: 79.1003 },
+  { name: 'Amaravati, Andhra Pradesh', city: 'Andhra Pradesh', lat: 16.5745, lon: 80.3598 }
+];
 
 const rideOptions = {
   bike: [
@@ -19,11 +47,29 @@ const rideOptions = {
 };
 
 const initialTrips = [
-  { id: 1, from: 'Madhapur', to: 'HITEC City', type: 'Bike', price: 86, date: 'Yesterday' },
-  { id: 2, from: 'Home', to: 'Central Mall', type: 'Mini Cab', price: 214, date: '12 Oct' },
+  { id: 1, from: 'Madhapur, Hyderabad', to: 'HITEC City, Hyderabad', type: 'Bike', price: 86, date: 'Yesterday' },
+  { id: 2, from: 'Vijayawada Railway Station', to: 'Benz Circle, Vijayawada', type: 'Mini Cab', price: 214, date: '12 Oct' }
 ];
 
 function money(n) { return '₹' + Math.round(n); }
+function findPlace(value) {
+  if (!value) return null;
+  return places.find(p => p.name === value) || places.find(p => value.toLowerCase().includes(p.name.split(',')[0].toLowerCase())) || null;
+}
+function distanceKm(a, b) {
+  if (!a || !b) return null;
+  const rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad;
+  const dLon = (b.lon - a.lon) * rad;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return Math.max(1, Math.round(6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)) * 1.25));
+}
+function mapUrl(point) {
+  const p = point || places[0];
+  const delta = 0.09;
+  const bbox = [p.lon - delta, p.lat - delta, p.lon + delta, p.lat + delta].join('%2C');
+  return 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + p.lat + '%2C' + p.lon;
+}
 
 export default function App() {
   const [mode, setMode] = useState('bike');
@@ -38,40 +84,87 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [toast, setToast] = useState('');
+  const [gps, setGps] = useState(null);
+  const [gpsStatus, setGpsStatus] = useState('Use GPS to detect your current position');
+  const [gpsLoading, setGpsLoading] = useState(false);
   const options = rideOptions[mode];
   const selectedRide = options.find(o => o.id === ride) || options[0];
+  const pickupPlace = findPlace(pickup);
+  const destinationPlace = findPlace(destination);
+  const mapPoint = gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]);
+  const calculatedDistance = distanceKm(pickupPlace, destinationPlace);
+  const effectiveDistance = calculatedDistance || distance;
   const fare = useMemo(() => {
     const base = mode === 'bike' ? 25 : 55;
-    return base + distance * (mode === 'bike' ? 9 : 15) * selectedRide.multiplier;
-  }, [mode, distance, selectedRide]);
-  const eta = Math.max(8, Math.round(distance * 4 + (mode === 'cab' ? 5 : 0)));
+    return base + effectiveDistance * (mode === 'bike' ? 9 : 15) * selectedRide.multiplier;
+  }, [mode, effectiveDistance, selectedRide]);
+  const eta = Math.max(8, Math.round(effectiveDistance * 4 + (mode === 'cab' ? 5 : 0)));
 
+  function notify(message) {
+    setToast(message);
+    window.setTimeout(() => setToast(''), 3200);
+  }
   function switchMode(next) {
     setMode(next);
     setRide(rideOptions[next][0].id);
     setBooking(null);
   }
-  function notify(message) {
-    setToast(message);
-    window.setTimeout(() => setToast(''), 2800);
+  function useCurrentLocation() {
+    if (!navigator.geolocation) {
+      setGpsStatus('GPS is not supported by this browser.');
+      notify('Your browser does not support location. Choose a place from the list.');
+      return;
+    }
+    setGpsLoading(true);
+    setGpsStatus('Requesting permission to access your location…');
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const point = { lat: position.coords.latitude, lon: position.coords.longitude };
+        setGps(point);
+        setPickup('My current location (' + point.lat.toFixed(5) + ', ' + point.lon.toFixed(5) + ')');
+        setGpsStatus('Location detected · accuracy about ' + Math.round(position.coords.accuracy) + ' m');
+        setGpsLoading(false);
+        notify('Current GPS location added as pickup.');
+      },
+      error => {
+        const message = error.code === 1 ? 'Location permission was denied. Allow location access in your browser.' : error.code === 2 ? 'Your location could not be determined. Try again or choose a city.' : 'Location request timed out. Try again.';
+        setGpsStatus(message);
+        setGpsLoading(false);
+        notify(message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+  function selectPickup(value) {
+    setPickup(value);
+    const p = findPlace(value);
+    if (p) setGps(null);
+    const d = findPlace(destination);
+    const km = distanceKm(p, d);
+    if (km) setDistance(Math.min(500, km));
+  }
+  function selectDestination(value) {
+    setDestination(value);
+    const km = distanceKm(findPlace(pickup), findPlace(value));
+    if (km) setDistance(Math.min(500, km));
   }
   function bookRide(e) {
     e.preventDefault();
     if (!pickup.trim() || !destination.trim()) {
-      notify('Enter both pickup and destination to continue.');
+      notify('Choose a pickup and destination to continue.');
       return;
     }
     const trip = {
       id: Date.now(), from: pickup.trim(), to: destination.trim(),
       type: selectedRide.name, price: Math.round(fare), date: when === 'now' ? 'Just now' : when,
-      mode, status: 'Driver assigned'
+      mode, status: 'Prototype booking', distance: effectiveDistance
     };
     setBooking(trip);
     setShowTrips(false);
   }
   function cancelBooking() {
     setBooking(null);
-    notify('Ride cancelled in this demo.');
+    notify('Demo booking cancelled.');
   }
 
   return (
@@ -86,17 +179,17 @@ export default function App() {
           <button className={showTrips ? 'nav-link active' : 'nav-link'} onClick={() => { setShowTrips(true); setBooking(null); setMenuOpen(false); }}>My rides</button>
           <a className="nav-link" href="#safety" onClick={() => setMenuOpen(false)}>Safety</a>
         </nav>
-        <button className="profile-button" onClick={() => notify('Profile and sign-in are demo features.')}><CircleUserRound size={19} /> <span>Sign in</span></button>
+        <button className="profile-button" onClick={() => notify('Sign-in is a demo feature.')}><CircleUserRound size={19} /> <span>Sign in</span></button>
         <button className="mobile-menu" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
       </header>
 
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <div className="eyebrow"><span className="live-dot"></span> YOUR CITY. YOUR RIDE.</div>
+            <div className="eyebrow"><span className="live-dot"></span> ANDHRA PRADESH · TELANGANA</div>
             <h1>Every journey,<br /><em>your way.</em></h1>
-            <p className="hero-sub">Zip through traffic on a bike or settle in for a comfortable cab. Your next ride is just a few taps away.</p>
-            <div className="hero-points"><span><ShieldCheck size={16}/> Safer rides</span><span><Wallet size={16}/> Clear fares</span><span><Zap size={16}/> Quick pickup</span></div>
+            <p className="hero-sub">Book a bike or cab, use your device GPS, and choose destinations across Andhra Pradesh and Telangana.</p>
+            <div className="hero-points"><span><ShieldCheck size={16}/> Safer rides</span><span><Wallet size={16}/> Clear estimates</span><span><Zap size={16}/> Quick pickup</span></div>
           </div>
           <div className="hero-art" aria-label="Cab and bike ride illustration">
             <div className="sun-orb"></div><div className="art-road"></div>
@@ -114,18 +207,18 @@ export default function App() {
             {booking ? (
               <div className="confirmation">
                 <div className="success-icon"><CheckCircle2 size={34}/></div>
-                <p className="eyebrow">BOOKING CONFIRMED · DEMO</p>
-                <h2>Your ride is on its way!</h2>
+                <p className="eyebrow">BOOKING SUMMARY · DEMO</p>
+                <h2>Your trip is ready to review</h2>
                 <p className="muted">This is a prototype confirmation. No real driver has been contacted.</p>
                 <div className="driver-card">
                   <div className="driver-avatar"><CircleUserRound size={30}/></div>
-                  <div className="driver-info"><strong>Ravi Kumar</strong><span><Star size={13} fill="currentColor"/> 4.9 · Demo driver</span><small>TS 09 AB 4821 · White {booking.mode === 'bike' ? 'scooter' : 'cab'}</small></div>
-                  <div className="driver-eta"><strong>4 min</strong><span>away</span></div>
+                  <div className="driver-info"><strong>Demo driver</strong><span><Star size={13} fill="currentColor"/> Sample profile · not a real driver</span><small>Vehicle and driver details are illustrative</small></div>
+                  <div className="driver-eta"><strong>{eta} min</strong><span>estimated</span></div>
                 </div>
-                <div className="route-summary"><div className="route-dots"><i></i><b></b></div><div><span>Pickup</span><strong>{booking.from}</strong><span className="route-dest-label">Destination</span><strong>{booking.to}</strong></div></div>
+                <div className="route-summary"><div className="route-dots"><i></i><b></b></div><div><span>Pickup</span><strong>{booking.from}</strong><span className="route-dest-label">Destination · {booking.distance} km estimated</span><strong>{booking.to}</strong></div></div>
                 <div className="fare-row"><span>{booking.type} · Pay by {payment}</span><strong>{money(booking.price)}</strong></div>
-                <button className="primary-button" onClick={() => notify('Calling is not available in this demo.')}><Headphones size={18}/> Contact driver (demo)</button>
-                <button className="text-button" onClick={cancelBooking}>Cancel ride</button>
+                <button className="primary-button" onClick={() => notify('No driver is connected in this prototype.')}><Headphones size={18}/> Contact driver (demo)</button>
+                <button className="text-button" onClick={cancelBooking}>Cancel demo booking</button>
               </div>
             ) : showTrips ? (
               <div className="trips-panel">
@@ -143,58 +236,57 @@ export default function App() {
                 </div>
                 <div className="locations">
                   <div className="location-rail"><span className="pickup-dot"></span><span className="rail-line"></span><span className="drop-dot"></span></div>
-                  <label className="location-field"><span>Pickup location</span><input value={pickup} onChange={e => setPickup(e.target.value)} placeholder="Enter pickup point" autoComplete="street-address"/><button type="button" aria-label="Use current location" className="locate-button" onClick={() => { setPickup('My current location'); notify('Demo location selected.'); }}><LocateFixed size={17}/></button></label>
-                  <label className="location-field"><span>Where to?</span><input value={destination} onChange={e => setDestination(e.target.value)} placeholder="Enter your destination" autoComplete="off"/></label>
+                  <label className="location-field"><span>Pickup location</span><input list="regional-places" value={pickup} onChange={e => selectPickup(e.target.value)} placeholder="Enter a city or use GPS" autoComplete="off"/><button type="button" aria-label="Use current location" className="locate-button" onClick={useCurrentLocation} disabled={gpsLoading}>{gpsLoading ? <span className="gps-spinner">…</span> : <LocateFixed size={17}/>}</button></label>
+                  <label className="location-field"><span>Where to?</span><input list="regional-places" value={destination} onChange={e => selectDestination(e.target.value)} placeholder="Choose destination city or area" autoComplete="off"/></label>
+                  <datalist id="regional-places">{places.map(p => <option key={p.name} value={p.name}/>)}</datalist>
                 </div>
-                <div className="quick-destinations"><span>Popular:</span>{['Airport', 'HITEC City', 'Railway station'].map(place => <button type="button" key={place} onClick={() => setDestination(place)}>{place}</button>)}</div>
+                <div className="gps-status" role="status"><Crosshair size={14}/><span>{gpsStatus}</span></div>
+                <div className="regional-picker">
+                  <div className="regional-title"><Map size={15}/> Popular locations <span>AP & TS</span></div>
+                  <div className="region-chips">{places.slice(0, 6).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
+                  <details className="all-places"><summary>Browse all 25 cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
+                </div>
+                {calculatedDistance && <div className="distance-note"><Route size={14}/> Approx. road-distance estimate: <strong>{calculatedDistance} km</strong> <span>(straight-line distance adjusted; actual route may vary)</span></div>}
                 <div className="section-label"><span>Choose your ride</span><span className="muted">Estimated pickup</span></div>
                 <div className="ride-options">
                   {options.map(opt => {
                     const Icon = opt.icon;
-                    const optFare =  (mode === 'bike' ? 25 : 55) + distance * (mode === 'bike' ? 9 : 15) * opt.multiplier;
+                    const optFare = (mode === 'bike' ? 25 : 55) + effectiveDistance * (mode === 'bike' ? 9 : 15) * opt.multiplier;
                     return <button type="button" key={opt.id} className={ride === opt.id ? 'ride-option chosen' : 'ride-option'} onClick={() => setRide(opt.id)}>
                       <span className="ride-option-icon"><Icon size={25}/></span><span className="ride-option-text"><strong>{opt.name}{opt.tag && <i>{opt.tag}</i>}</strong><small>{opt.detail}</small></span><span className="ride-option-price"><strong>{money(optFare)}</strong><small><Clock3 size={12}/> {opt.time}</small></span>
                     </button>;
                   })}
                 </div>
-                <div className="distance-control"><span><Route size={15}/> Trip distance</span><div className="distance-stepper"><button type="button" aria-label="Decrease distance" onClick={() => setDistance(Math.max(1, distance - 1))}><Minus size={14}/></button><strong>{distance} km</strong><button type="button" aria-label="Increase distance" onClick={() => setDistance(Math.min(40, distance + 1))}><Plus size={14}/></button></div></div>
+                <div className="distance-control"><span><Route size={15}/> Trip distance</span><div className="distance-stepper"><button type="button" aria-label="Decrease distance" onClick={() => setDistance(Math.max(1, distance - 1))}><Minus size={14}/></button><strong>{effectiveDistance} km{calculatedDistance ? ' approx.' : ''}</strong><button type="button" aria-label="Increase distance" onClick={() => setDistance(Math.min(500, distance + 1))}><Plus size={14}/></button></div></div>
                 <div className="form-bottom">
                   <label className="payment-select"><Wallet size={17}/><select value={payment} onChange={e => setPayment(e.target.value)} aria-label="Payment method"><option>UPI</option><option>Cash</option><option>Card</option></select><ChevronDown size={14}/></label>
                   <label className="schedule-select"><CalendarClock size={17}/><select value={when} onChange={e => setWhen(e.target.value)} aria-label="Pickup time"><option value="now">Ride now</option><option value="Scheduled 9:00 AM">Schedule 9:00 AM</option><option value="Scheduled 6:00 PM">Schedule 6:00 PM</option></select><ChevronDown size={14}/></label>
                 </div>
                 <button className="primary-button" type="submit"><span>Confirm {selectedRide.name}</span><span>{money(fare)} <ArrowRight size={18}/></span></button>
-                <p className="fine-print"><ShieldCheck size={13}/> Fare is an estimate for this demo, not a live quote.</p>
+                <p className="fine-print"><ShieldCheck size={13}/> Fare and distance are estimates. Live driver dispatch is not connected.</p>
               </form>
             )}
           </div>
           <div className="map-panel">
-            <div className="map-topline"><div><span className="live-dot"></span> LIVE CITY VIEW <small>· DEMO MAP</small></div><button onClick={() => notify('Live GPS map will be added in a production version.')}><MapPin size={15}/> Map details</button></div>
-            <div className="illustrated-map">
-              <div className="map-grid"></div><div className="park park-a"><span>GREEN PARK</span></div><div className="park park-b"></div>
-              <div className="waterway"></div><div className="road road-h"></div><div className="road road-v"></div><div className="road road-diag"></div>
-              <div className="map-street street-a">JUBILEE HILLS RD</div><div className="map-street street-b">MADHAPUR MAIN RD</div><div className="map-street street-c">TECH PARK ROAD</div>
-              <div className="map-pin pin-a"><span><MapPin size={18} fill="currentColor"/></span><b>Pickup zone</b></div><div className="map-pin pin-b"><span><Navigation size={17} fill="currentColor"/></span><b>Destination</b></div>
-              <div className="map-route"></div><div className="map-car"><CarFront size={22}/></div><div className="map-bike"><Bike size={20}/></div>
-              <div className="map-zoom"><button onClick={() => setDistance(Math.min(40, distance + 1))} aria-label="Zoom in"><Plus size={16}/></button><button onClick={() => setDistance(Math.max(1, distance - 1))} aria-label="Zoom out"><Minus size={16}/></button></div>
-              <div className="map-scale">Hyderabad, India <span>Map illustration · not to scale</span></div>
-            </div>
-            <div className="map-footer"><div className="nearby-icon"><CarFront size={20}/></div><div><strong>Rides nearby</strong><span>Drivers shown are illustrative</span></div><div className="nearby-count"><strong>12</strong><span>available</span></div></div>
-            <div className="map-benefits"><div><span className="benefit-icon"><Clock3 size={18}/></span><strong>Quick pickup</strong><small>Estimated arrival times</small></div><div><span className="benefit-icon"><ShieldCheck size={18}/></span><strong>Ride with care</strong><small>Safety-first experience</small></div><div><span className="benefit-icon"><Wallet size={18}/></span><strong>Know the fare</strong><small>Estimate before booking</small></div></div>
+            <div className="map-topline"><div><span className="live-dot"></span> REGIONAL MAP <small>· OPENSTREETMAP</small></div><button onClick={useCurrentLocation}><LocateFixed size={15}/> Locate me</button></div>
+            <div className="live-map-wrap"><iframe title="Interactive map for selected Andhra Pradesh or Telangana location" src={mapUrl(mapPoint)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /><a className="open-map-link" href={'https://www.openstreetmap.org/?mlat=' + mapPoint.lat + '&mlon=' + mapPoint.lon + '#map=13/' + mapPoint.lat + '/' + mapPoint.lon} target="_blank" rel="noreferrer">Open full map <ArrowRight size={13}/></a></div>
+            <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location'}</strong><span>{gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Select a destination to move the map'}</span></div><div className="nearby-count"><strong>{gps ? 'GPS' : 'MAP'}</strong><span>{gps ? 'detected' : 'interactive'}</span></div></div>
+            <div className="map-benefits"><div><span className="benefit-icon"><Crosshair size={18}/></span><strong>Device location</strong><small>Permission required</small></div><div><span className="benefit-icon"><MapPin size={18}/></span><strong>Regional places</strong><small>AP and Telangana</small></div><div><span className="benefit-icon"><Route size={18}/></span><strong>Route estimate</strong><small>Not turn-by-turn</small></div></div>
           </div>
         </section>
 
         <section className="how-section">
-          <div className="section-intro"><p className="eyebrow">SIMPLE AS 1, 2, 3</p><h2>Good rides. <em>No guesswork.</em></h2><p>From your first tap to your final stop, we keep it simple.</p></div>
-          <div className="steps-grid"><div className="step-card"><span className="step-number">01</span><div className="step-icon"><MapPin size={23}/></div><h3>Set your route</h3><p>Choose where you're going and see your estimated fare up front.</p></div><div className="step-card"><span className="step-number">02</span><div className="step-icon"><Bike size={24}/></div><h3>Pick your ride</h3><p>Go light with a bike or choose a cab for more room and comfort.</p></div><div className="step-card"><span className="step-number">03</span><div className="step-icon"><Heart size={23}/></div><h3>Ride with ease</h3><p>Review your driver details and enjoy a smoother trip experience.</p></div></div>
+          <div className="section-intro"><p className="eyebrow">SIMPLE AS 1, 2, 3</p><h2>Good rides. <em>No guesswork.</em></h2><p>Choose a regional destination, check the map and compare estimated fares.</p></div>
+          <div className="steps-grid"><div className="step-card"><span className="step-number">01</span><div className="step-icon"><MapPin size={23}/></div><h3>Set your route</h3><p>Enter a pickup and destination or allow GPS to detect your current location.</p></div><div className="step-card"><span className="step-number">02</span><div className="step-icon"><Bike size={24}/></div><h3>Pick your ride</h3><p>Choose a bike or a cab and compare estimated prices before booking.</p></div><div className="step-card"><span className="step-number">03</span><div className="step-icon"><Heart size={23}/></div><h3>Ride with ease</h3><p>Review the route and booking summary. Real driver dispatch is not yet connected.</p></div></div>
         </section>
 
-        <section className="safety-banner" id="safety"><div className="safety-symbol"><ShieldCheck size={30}/></div><div><p className="eyebrow">YOUR SAFETY MATTERS</p><h2>A little more peace of mind.</h2><p>Driver details, trip summary and support options are part of the RideWave concept.</p></div><button onClick={() => notify('Safety center is a demo feature.')} className="safety-button">Explore safety <ArrowRight size={16}/></button></section>
-        <section className="app-banner"><div className="app-banner-icon"><Smartphone size={30}/></div><div><p className="eyebrow">YOUR NEXT RIDE IS CLOSER</p><h2>Ready when you are.</h2><p>Prototype only — no real rides, payments, GPS, or driver dispatch.</p></div><button onClick={() => document.getElementById('booking').scrollIntoView({behavior:'smooth'})}>Book a ride <ArrowRight size={17}/></button></section>
+        <section className="safety-banner" id="safety"><div className="safety-symbol"><ShieldCheck size={30}/></div><div><p className="eyebrow">YOUR SAFETY MATTERS</p><h2>Location access stays in your control.</h2><p>Your browser asks before sharing GPS. You can use the city list instead of location access.</p></div><button onClick={() => notify('GPS access is controlled by your browser settings.')} className="safety-button">Location privacy <ArrowRight size={16}/></button></section>
+        <section className="app-banner"><div className="app-banner-icon"><Smartphone size={30}/></div><div><p className="eyebrow">YOUR NEXT RIDE IS CLOSER</p><h2>Ready when you are.</h2><p>Prototype only — no real driver dispatch, live driver tracking, or payments.</p></div><button onClick={() => document.getElementById('booking').scrollIntoView({behavior:'smooth'})}>Book a ride <ArrowRight size={17}/></button></section>
       </main>
 
       <footer><a className="brand footer-brand" href="#"><span className="brand-mark"><Navigation size={18} fill="currentColor"/></span><span>ride<span className="brand-light">wave</span></span></a><span>© 2026 RideWave Prototype</span><div><a href="#safety">Safety</a><button onClick={() => notify('Help center is a demo feature.')}>Help</button><button onClick={() => setFavorite(!favorite)}><Heart size={14} fill={favorite ? 'currentColor' : 'none'}/> {favorite ? 'Saved' : 'Save app'}</button></div></footer>
       {toast && <div className="toast" role="status"><CheckCircle2 size={17}/>{toast}</div>}
-      <div className="prototype-disclaimer">DEMO PROTOTYPE · NOT A REAL TRANSPORT SERVICE</div>
+      <div className="prototype-disclaimer">DEMO PROTOTYPE · GPS REQUIRES PERMISSION · NOT A REAL TRANSPORT SERVICE</div>
     </div>
   );
 }
