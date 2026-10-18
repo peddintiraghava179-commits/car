@@ -252,7 +252,7 @@ export default function App() {
     : null;
   const mapPoint = routeMidpoint || (gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]));
   const routeCoordinates = routeLine(routeStart, routeEnd, mapPoint);
-  const calculatedDistance = distanceKm(pickupPlace, destinationPlace);
+  const calculatedDistance = distanceKm(routeStart, destinationPlace);
   const effectiveDistance = calculatedDistance || distance;
   const fare = useMemo(() => {
     const base = mode === 'bike' ? 25 : 55;
