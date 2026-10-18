@@ -175,12 +175,12 @@ const initialTrips = [
 ];
 
 function money(n) { return '₹' + Math.round(n); }
-function findPlace(value) {
+function findPlace(value, villagePlaces = []) {
   if (!value) return null;
-  return places.find(p => p.name === value) || places.find(p => value.toLowerCase().includes(p.name.split(',')[0].toLowerCase())) || null;
+  return places.find(p => p.name === value) || villagePlaces.find(p => p.name === value) || places.find(p => value.toLowerCase().includes(p.name.split(',')[0].toLowerCase())) || null;
 }
 function distanceKm(a, b) {
-  if (!a || !b) return null;
+  if (!a || !b || !Number.isFinite(a.lat) || !Number.isFinite(a.lon) || !Number.isFinite(b.lat) || !Number.isFinite(b.lon)) return null;
   const rad = Math.PI / 180;
   const dLat = (b.lat - a.lat) * rad;
   const dLon = (b.lon - a.lon) * rad;
@@ -201,14 +201,15 @@ function mapBounds(point, start, end) {
   const p = point || places[0];
   return { minLon: p.lon - 0.09, maxLon: p.lon + 0.09, minLat: p.lat - 0.09, maxLat: p.lat + 0.09 };
 }
-function mapUrl(point, start, end) {
+function mapUrl(point, start, end, pickupName, destinationName) {
   if (start && end) {
     return 'https://www.google.com/maps?output=embed&saddr=' +
       encodeURIComponent(start.lat + ',' + start.lon) + '&daddr=' +
       encodeURIComponent(end.lat + ',' + end.lon);
   }
   const p = point || places[0];
-  return 'https://www.google.com/maps?q=' + encodeURIComponent(p.lat + ',' + p.lon) + '&output=embed';
+  const query = destinationName || pickupName || (Number.isFinite(p.lat) ? p.lat + ',' + p.lon : p.name);
+  return 'https://www.google.com/maps?q=' + encodeURIComponent(query) + '&output=embed';
 }
 function googleDirectionsUrl(start, end, pickupName, destinationName, mode) {
   const origin = start ? start.lat + ',' + start.lon : pickupName;
@@ -251,18 +252,70 @@ export default function App() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [roadDistance, setRoadDistance] = useState(null);
   const [roadDistanceStatus, setRoadDistanceStatus] = useState('');
+  const [villagePlaces, setVillagePlaces] = useState([]);
+  const [villageDataStatus, setVillageDataStatus] = useState('Loading Andhra Pradesh and Telangana village directory…');
+  const [activeLocationField, setActiveLocationField] = useState('pickup');
+  useEffect(() => {
+    let active = true;
+    const base = 'https://raw.githubusercontent.com/mchittineni/india-village-finder/main/';
+    const sources = [
+      { state: 'Andhra Pradesh', folder: 'andhra_pradesh' },
+      { state: 'Telangana', folder: 'telangana' }
+    ];
+    Promise.all(sources.map(async source => {
+      const [villageResponse, regionResponse] = await Promise.all([
+        fetch(base + source.folder + '/web/data/villages.json'),
+        fetch(base + source.folder + '/web/data/regions.json')
+      ]);
+      if (!villageResponse.ok || !regionResponse.ok) throw new Error('Village directory could not be loaded');
+      const [villageData, regionData] = await Promise.all([villageResponse.json(), regionResponse.json()]);
+      const mandals = new Map((regionData.mandals || []).map(m => [Number(m.i), m]));
+      const districts = new Map((regionData.districts || []).map(d => [Number(d.i), d]));
+      return (villageData.rows || []).map(row => {
+        const mandal = mandals.get(Number(row[1]));
+        const district = mandal ? districts.get(Number(mandal.d)) : null;
+        const hierarchy = [mandal && mandal.n, district && district.n, source.state].filter(Boolean).join(', ');
+        return {
+          name: row[0] + ', ' + hierarchy,
+          city: source.state,
+          state: source.state,
+          district: district ? district.n : '',
+          mandal: mandal ? mandal.n : '',
+          pin: row[4] || '',
+          code: row[2],
+          isVillage: true
+        };
+      });
+    })).then(results => {
+      if (!active) return;
+      const allVillages = results.flat();
+      setVillagePlaces(allVillages);
+      setVillageDataStatus('Village directory ready · ' + allVillages.length.toLocaleString() + ' village entries');
+    }).catch(() => {
+      if (active) setVillageDataStatus('Village directory could not load. Popular city locations remain available.');
+    });
+    return () => { active = false; };
+  }, []);
+  const activeSearchValue = activeLocationField === 'pickup' ? pickup : destination;
+  const visiblePlaceOptions = useMemo(() => {
+    const query = activeSearchValue.trim().toLowerCase();
+    if (!query) return places;
+    return [...places, ...villagePlaces]
+      .filter(place => place.name.toLowerCase().includes(query) || (place.pin && place.pin.includes(query)))
+      .slice(0, 80);
+  }, [activeSearchValue, villagePlaces]);
   const options = rideOptions[mode];
   const selectedRide = options.find(o => o.id === ride) || options[0];
-  const pickupPlace = findPlace(pickup);
-  const destinationPlace = findPlace(destination);
-  const routeStart = pickupPlace || (gps && pickup.toLowerCase().includes('current location') ? gps : null);
-  const routeEnd = destinationPlace;
+  const pickupPlace = findPlace(pickup, villagePlaces);
+  const destinationPlace = findPlace(destination, villagePlaces);
+  const routeStart = pickupPlace && Number.isFinite(pickupPlace.lat) ? pickupPlace : (gps && pickup.toLowerCase().includes('current location') ? gps : null);
+  const routeEnd = destinationPlace && Number.isFinite(destinationPlace.lat) ? destinationPlace : null;
   const routeMidpoint = routeStart && routeEnd
     ? { lat: (routeStart.lat + routeEnd.lat) / 2, lon: (routeStart.lon + routeEnd.lon) / 2, name: 'Route overview' }
     : null;
   const mapPoint = routeMidpoint || (gps && pickup.toLowerCase().includes('current location') ? gps : (destinationPlace || pickupPlace || places[0]));
   const routeCoordinates = routeLine(routeStart, routeEnd, mapPoint);
-  const calculatedDistance = distanceKm(routeStart, destinationPlace);
+  const calculatedDistance = distanceKm(routeStart, routeEnd);
   useEffect(() => {
     let active = true;
     setRoadDistance(null);
@@ -338,15 +391,15 @@ export default function App() {
   }
   function selectPickup(value) {
     setPickup(value);
-    const p = findPlace(value);
+    const p = findPlace(value, villagePlaces);
     if (p) setGps(null);
-    const d = findPlace(destination);
+    const d = findPlace(destination, villagePlaces);
     const km = distanceKm(p, d);
     if (km) setDistance(Math.min(500, km));
   }
   function selectDestination(value) {
     setDestination(value);
-    const km = distanceKm(findPlace(pickup), findPlace(value));
+    const km = distanceKm(findPlace(pickup, villagePlaces), findPlace(value, villagePlaces));
     if (km) setDistance(Math.min(500, km));
   }
   function bookRide(e) {
@@ -452,16 +505,18 @@ export default function App() {
                 </div>
                 <div className="locations">
                   <div className="location-rail"><span className="pickup-dot"></span><span className="rail-line"></span><span className="drop-dot"></span></div>
-                  <label className="location-field"><span>Pickup location</span><input list="regional-places" value={pickup} onChange={e => selectPickup(e.target.value)} placeholder="Enter a city or use GPS" autoComplete="off"/><button type="button" aria-label="Use current location" className="locate-button" onClick={useCurrentLocation} disabled={gpsLoading}>{gpsLoading ? <span className="gps-spinner">…</span> : <LocateFixed size={17}/>}</button></label>
-                  <label className="location-field"><span>Where to?</span><input list="regional-places" value={destination} onChange={e => selectDestination(e.target.value)} placeholder="Choose destination city or area" autoComplete="off"/></label>
-                  <datalist id="regional-places">{places.map(p => <option key={p.name} value={p.name}/>)}</datalist>
+                  <label className="location-field"><span>Pickup location</span><input list="regional-places" value={pickup} onFocus={() => setActiveLocationField('pickup')} onChange={e => selectPickup(e.target.value)} placeholder="Search city, mandal or village" autoComplete="off"/><button type="button" aria-label="Use current location" className="locate-button" onClick={useCurrentLocation} disabled={gpsLoading}>{gpsLoading ? <span className="gps-spinner">…</span> : <LocateFixed size={17}/>}</button></label>
+                  <label className="location-field"><span>Where to?</span><input list="regional-places" value={destination} onFocus={() => setActiveLocationField('destination')} onChange={e => selectDestination(e.target.value)} placeholder="Search destination village or town" autoComplete="off"/></label>
+                  <datalist id="regional-places">{visiblePlaceOptions.map(p => <option key={p.name} value={p.name}/>)}</datalist>
                 </div>
                 <div className="gps-status" role="status"><Crosshair size={14}/><span>{gpsStatus}</span></div>
                 <div className="regional-picker">
                   <div className="regional-title"><Map size={15}/> Popular locations <span>TN · AP · TS</span></div>
+                  <div className="demo-note">{villageDataStatus}. Type a village name above to search the full Andhra Pradesh and Telangana directory. Village road distance may need manual adjustment; use Google Maps for directions.</div>
                   <div className="region-chips">{places.filter(p => ['Chennai, Tamil Nadu', 'Coimbatore, Tamil Nadu', 'Hyderabad, Telangana', 'Vijayawada, Andhra Pradesh', 'Visakhapatnam, Andhra Pradesh', 'Palakollu, Andhra Pradesh'].includes(p.name)).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]}</button>)}</div>
-                  <details className="all-places"><summary>Browse all {places.length} cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
+                  <details className="all-places"><summary>Browse listed cities and towns</summary><div className="place-list">{['Telangana', 'Andhra Pradesh'].map(region => <div key={region}><strong>{region}</strong>{places.filter(p => p.city === region).map(p => <button type="button" key={p.name} onClick={() => selectDestination(p.name)}>{p.name.split(',')[0]} <span>Use as destination</span></button>)}</div>)}</div></details>
                 </div>
+                {(pickupPlace?.isVillage || destinationPlace?.isVillage) && !(routeStart && routeEnd) && <div className="distance-note"><Route size={14}/> Village selected <span>Road distance is not verified here; adjust trip distance below and use Google Maps for directions.</span></div>}
                 {routeStart && routeEnd && <div className="distance-note"><Route size={14}/> {roadDistanceStatus || 'Calculating route distance…'}: <strong>{effectiveDistance} km</strong> <span>{roadDistance ? '(road route estimate)' : '(fallback estimate; Google Maps may show a different route)'}</span></div>}
                 <div className="section-label"><span>Choose your ride</span><span className="muted">Estimated pickup</span></div>
                 <div className="ride-options">
@@ -485,7 +540,7 @@ export default function App() {
           </div>
           <div className="map-panel">
             <div className="map-topline"><div><span className="live-dot"></span> REGIONAL MAP <small>· OPENSTREETMAP</small></div><button onClick={useCurrentLocation}><LocateFixed size={15}/> Locate me</button></div>
-            <div className="live-map-wrap"><iframe title="Google Maps showing the selected ride route" src={mapUrl(mapPoint, routeStart, routeEnd)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />{routeCoordinates && <div className="route-map-pill"><Route size={13}/> {effectiveDistance} km · {money(fare)} est.</div>}<a className="open-map-link" href={routeStart && routeEnd ? googleDirectionsUrl(routeStart, routeEnd, pickup, destination, mode) : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapPoint.name || (mapPoint.lat + ',' + mapPoint.lon))} target="_blank" rel="noreferrer">Open in Google Maps <ArrowRight size={13}/></a></div>
+            <div className="live-map-wrap"><iframe title="Google Maps showing the selected ride route" src={mapUrl(mapPoint, routeStart, routeEnd, pickup, destination)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />{routeCoordinates && <div className="route-map-pill"><Route size={13}/> {effectiveDistance} km · {money(fare)} est.</div>}<a className="open-map-link" href={routeStart && routeEnd ? googleDirectionsUrl(routeStart, routeEnd, pickup, destination, mode) : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapPoint.name || (mapPoint.lat + ',' + mapPoint.lon))} target="_blank" rel="noreferrer">Open in Google Maps <ArrowRight size={13}/></a></div>
             <div className="map-location-caption"><div className="nearby-icon"><MapPin size={20}/></div><div><strong>{routeStart && routeEnd ? pickup + ' → ' + destination : (gps && pickup.toLowerCase().includes('current location') ? 'Your detected location' : mapPoint.name || 'Selected location')}</strong><span>{routeCoordinates ? 'Google Maps route preview · road distance updates when available' : gps && pickup.toLowerCase().includes('current location') ? 'Browser GPS coordinates' : 'Choose pickup and destination to preview a route'}</span></div><div className="nearby-count"><strong>{routeCoordinates ? effectiveDistance + ' km' : gps ? 'GPS' : 'MAP'}</strong><span>{routeCoordinates ? money(fare) + ' est. fare' : gps ? 'detected' : 'interactive'}</span></div></div>
             <div className="map-benefits"><div><span className="benefit-icon"><Crosshair size={18}/></span><strong>Device location</strong><small>Permission required</small></div><div><span className="benefit-icon"><MapPin size={18}/></span><strong>Regional places</strong><small>Tamil Nadu, AP and Telangana</small></div><div><span className="benefit-icon"><Route size={18}/></span><strong>Route estimate</strong><small>Not turn-by-turn</small></div></div>
           </div>
