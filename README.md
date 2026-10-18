@@ -6,7 +6,7 @@ Responsive React + Vite ride-booking demo focused on Andhra Pradesh and Telangan
 - Switch between bike/scooter and cab/mini/sedan/XL ride options.
 - Browser geolocation using the device's GPS/location permission to fill the pickup field.
 - Interactive OpenStreetMap embed that centers on the selected regional place or detected GPS coordinates.
-- Regional destination list with 25 cities/towns across Telangana and Andhra Pradesh, including Hyderabad, Warangal, Karimnagar, Visakhapatnam, Vijayawada, Guntur, Tirupati, Kurnool, Rajahmundry, Nellore and more.
+- Regional destination list with 36 cities/towns across Telangana and Andhra Pradesh, including Hyderabad, Visakhapatnam, Vijayawada, Palakollu, Bhimavaram, Amalapuram, Tanuku, Tadepalligudem, Narasapuram, Mandapeta, Ravulapalem, and more.
 - Estimated trip distance when both selected places are in the regional place list, plus estimated fares.
 - Pickup/destination fields, ride timing and payment-method selectors, booking summary, and sample ride history.
 - Responsive layout for desktop and mobile.
